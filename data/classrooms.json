@@ -1,0 +1,150 @@
+{
+  "campName": "Little Stars Summer Camp",
+  "campNameAr": "مخيم النجوم الصغيرة الصيفي",
+  "campLocation": "Salmiya, Kuwait",
+  "campLocationAr": "السالمية، الكويت",
+  "weeks": [
+    {
+      "id": "week-1",
+      "label": "Week 1: June 23 – June 27",
+      "labelAr": "الأسبوع 1: 23 يونيو – 27 يونيو",
+      "startDate": "2025-06-23",
+      "endDate": "2025-06-27"
+    },
+    {
+      "id": "week-2",
+      "label": "Week 2: June 30 – July 4",
+      "labelAr": "الأسبوع 2: 30 يونيو – 4 يوليو",
+      "startDate": "2025-06-30",
+      "endDate": "2025-07-04"
+    }
+  ],
+  "timeSlots": [
+    {
+      "id": "morning",
+      "label": "Morning · 9:00 AM – 12:00 PM",
+      "labelAr": "صباحي · 9:00 ص – 12:00 م",
+      "startTime": "09:00",
+      "endTime": "12:00"
+    },
+    {
+      "id": "afternoon",
+      "label": "Afternoon · 1:00 PM – 4:00 PM",
+      "labelAr": "مسائي · 1:00 م – 4:00 م",
+      "startTime": "13:00",
+      "endTime": "16:00"
+    }
+  ],
+  "instructors": [
+    {
+      "id": "inst-sara",
+      "name": "Sara Al-Mutairi",
+      "nameAr": "سارة المطيري",
+      "specialty": "Arts & Crafts",
+      "specialtyAr": "الفنون والحرف اليدوية"
+    },
+    {
+      "id": "inst-ahmed",
+      "name": "Ahmed Al-Rashidi",
+      "nameAr": "أحمد الراشدي",
+      "specialty": "STEM & Robotics",
+      "specialtyAr": "العلوم والروبوتات"
+    },
+    {
+      "id": "inst-fatima",
+      "name": "Fatima Al-Sabah",
+      "nameAr": "فاطمة الصباح",
+      "specialty": "Language & Storytelling",
+      "specialtyAr": "اللغة والقصص"
+    },
+    {
+      "id": "inst-khalid",
+      "name": "Khalid Al-Enezi",
+      "nameAr": "خالد العنزي",
+      "specialty": "Sports & Movement",
+      "specialtyAr": "الرياضة والحركة"
+    }
+  ],
+  "classrooms": [
+    {
+      "id": "room-robots-boys",
+      "name": "Robots Lab — Boys",
+      "nameAr": "مختبر الروبوتات — بنين",
+      "gender": "boys",
+      "ageRange": [7, 12],
+      "pricePerDay": 5.000,
+      "pricePerWeek": 22.500,
+      "weekDiscount": 10,
+      "totalSeats": 15,
+      "description": "Hands-on STEM and robotics for curious minds.",
+      "descriptionAr": "برنامج عملي في العلوم والروبوتات للعقول الفضولية.",
+      "days": [
+        { "date": "2025-06-23", "instructorId": "inst-ahmed", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 8 },
+        { "date": "2025-06-24", "instructorId": "inst-ahmed", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 10 },
+        { "date": "2025-06-25", "instructorId": "inst-khalid", "availableSlots": ["morning"], "seatsRemaining": 7 },
+        { "date": "2025-06-26", "instructorId": "inst-ahmed", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 12 },
+        { "date": "2025-06-27", "instructorId": "inst-ahmed", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 9 }
+      ]
+    },
+    {
+      "id": "room-arts-girls",
+      "name": "Arts Studio — Girls",
+      "nameAr": "استوديو الفنون — بنات",
+      "gender": "girls",
+      "ageRange": [5, 10],
+      "pricePerDay": 4.500,
+      "pricePerWeek": 20.000,
+      "weekDiscount": 11,
+      "totalSeats": 12,
+      "description": "Creative arts and crafts in a fun, supportive environment.",
+      "descriptionAr": "فنون إبداعية في بيئة داعمة وممتعة.",
+      "days": [
+        { "date": "2025-06-23", "instructorId": "inst-sara", "availableSlots": ["morning"], "seatsRemaining": 5 },
+        { "date": "2025-06-24", "instructorId": "inst-sara", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 8 },
+        { "date": "2025-06-25", "instructorId": "inst-sara", "availableSlots": ["morning"], "seatsRemaining": 4 },
+        { "date": "2025-06-26", "instructorId": "inst-sara", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 6 },
+        { "date": "2025-06-27", "instructorId": "inst-sara", "availableSlots": ["morning"], "seatsRemaining": 7 }
+      ]
+    },
+    {
+      "id": "room-lang-girls",
+      "name": "Language Hub — Girls",
+      "nameAr": "مركز اللغة — بنات",
+      "gender": "girls",
+      "ageRange": [6, 11],
+      "pricePerDay": 4.000,
+      "pricePerWeek": 18.000,
+      "weekDiscount": 10,
+      "totalSeats": 10,
+      "description": "English storytelling, reading, and creative writing.",
+      "descriptionAr": "القصص الإنجليزية والقراءة والكتابة الإبداعية.",
+      "days": [
+        { "date": "2025-06-23", "instructorId": "inst-fatima", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 3 },
+        { "date": "2025-06-24", "instructorId": "inst-fatima", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 5 },
+        { "date": "2025-06-25", "instructorId": "inst-fatima", "availableSlots": ["morning"], "seatsRemaining": 2 },
+        { "date": "2025-06-26", "instructorId": "inst-fatima", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 6 },
+        { "date": "2025-06-27", "instructorId": "inst-fatima", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 4 }
+      ]
+    },
+    {
+      "id": "room-sports-boys",
+      "name": "Sports Academy — Boys",
+      "nameAr": "أكاديمية الرياضة — بنين",
+      "gender": "boys",
+      "ageRange": [8, 14],
+      "pricePerDay": 5.500,
+      "pricePerWeek": 24.750,
+      "weekDiscount": 10,
+      "totalSeats": 20,
+      "description": "Football, basketball, and team-building activities.",
+      "descriptionAr": "كرة القدم والسلة وأنشطة بناء الفريق.",
+      "days": [
+        { "date": "2025-06-23", "instructorId": "inst-khalid", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 14 },
+        { "date": "2025-06-24", "instructorId": "inst-khalid", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 16 },
+        { "date": "2025-06-25", "instructorId": "inst-khalid", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 12 },
+        { "date": "2025-06-26", "instructorId": "inst-khalid", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 18 },
+        { "date": "2025-06-27", "instructorId": "inst-khalid", "availableSlots": ["morning", "afternoon"], "seatsRemaining": 15 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Read(//Users/skf/**)",
+      "Bash(npx create-next-app@latest booking-app --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --defaults -y)",
+      "Bash(npx shadcn@latest add card input label select table badge dialog form textarea)",
+      "Bash(npx shadcn@latest add dropdown-menu separator avatar tabs)",
+      "Bash(brew services *)",
+      "Bash(docker --version)",
+      "Bash(brew --version)",
+      "Bash(npx prisma *)",
+      "Bash(npm list *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(kill 7687)",
+      "Bash(ps -p 1193 -p 7482 -o pid,comm,args)",
+      "Bash(kill 7482)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(curl -s http://localhost:3000/en)",
+      "Bash(grep -oP '<\\(section|header|footer|h1|h2|p\\)[^>]*>[^<]{0,100}')",
+      "Bash(rm /Users/skf/Booking-App/app/\\\\[lang\\\\]/login/page.tsx)",
+      "Bash(rmdir /Users/skf/Booking-App/app/\\\\[lang\\\\]/login)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/en/signup)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

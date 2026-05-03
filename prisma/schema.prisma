@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite does not support enums — values are stored as strings and validated at app level.
+// Gender: "BOYS" | "GIRLS" | "MIXED"
+// DayOfWeek: "SUNDAY" | "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY"
+// BookingStatus: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED" | "FAILED"
+// PaymentStatus: "INITIATED" | "SUCCESS" | "FAILED" | "EXPIRED"
+// WaitlistStatus: "WAITING" | "OFFERED" | "BOOKED" | "EXPIRED" | "CANCELLED"
+// AttendanceStatus: "PRESENT" | "ABSENT" | "EXCUSED"
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Classroom {
+  id           String    @id @default(cuid())
+  nameAr       String
+  nameEn       String
+  gender       String    // "BOYS" | "GIRLS" | "MIXED"
+  capacity     Int
+  ageRangeMin  Int       @default(5)
+  ageRangeMax  Int       @default(18)
+  pricePerDay  Float
+  weekDiscount Int       @default(10)
+  activityType String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions     Session[]
+  waitlist     Waitlist[]
+  attendance   Attendance[]
+}
+
+model Instructor {
+  id             String    @id @default(cuid())
+  nameAr         String
+  nameEn         String
+  phone          String?
+  email          String?
+  bio            String?
+  photo          String?
+  certifications String    @default("")
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sessions       Session[]
+}
+
+// A session = a specific classroom + instructor + day-of-week slot
+model Session {
+  id           String     @id @default(cuid())
+  classroomId  String
+  instructorId String
+  day          String     // "MONDAY" | "TUESDAY" | etc.
+  startTime    String
+  endTime      String
+  seatsTotal   Int
+  isActive     Boolean    @default(true)
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  classroom    Classroom  @relation(fields: [classroomId], references: [id])
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+  waitlist     Waitlist[]
+
+  @@index([classroomId])
+  @@index([instructorId])
+  @@index([day])
+}
+
+// A booking can span multiple days — line items stored as JSON
+model Booking {
+  id           String   @id @default(cuid())
+  bookingRef   String   @unique
+  status       String   @default("PENDING") // "PENDING" | "PAID" | "CANCELLED" | "REFUNDED" | "FAILED"
+
+  // Line items (JSON array of { classroomId, date, timeSlotId, instructorId, unitPrice })
+  lineItemsJson String
+
+  // Child
+  childName    String
+  childAge     Int
+  childGender  String
+
+  // Parent / guardian
+  parentName   String
+  parentEmail  String
+  parentPhone  String
+
+  // Extras
+  hasSibling   Boolean @default(false)
+  promoCode    String?
+  medicalNotes String?
+
+  // Pricing (KWD — stored as Float for SQLite)
+  subtotalKwd  Float
+  discountKwd  Float
+  totalKwd     Float
+
+  // Payment
+  paymentStatus  String  @default("INITIATED") // "INITIATED" | "SUCCESS" | "FAILED" | "EXPIRED"
+  paymentMethod  String?
+  isCashPayment  Boolean @default(false)
+  paymentId      String?
+  invoiceId      String?
+  paidAt         DateTime?
+
+  // Notification tracking
+  confirmationEmailSentAt    DateTime?
+  confirmationWhatsappSentAt DateTime?
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendance Attendance[]
+
+  @@index([status])
+  @@index([parentEmail])
+  @@index([bookingRef])
+  @@index([createdAt])
+}
+
+model Waitlist {
+  id          String    @id @default(cuid())
+  sessionId   String?
+  classroomId String
+  parentName  String
+  parentEmail String
+  parentPhone String
+  childName   String
+  childAge    Int
+  childGender String
+  status      String    @default("WAITING") // "WAITING" | "OFFERED" | "BOOKED" | "EXPIRED" | "CANCELLED"
+  offeredAt   DateTime?
+  expiresAt   DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  session     Session?  @relation(fields: [sessionId], references: [id])
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  @@index([classroomId])
+  @@index([sessionId])
+  @@index([status])
+}
+
+// Temporary draft persisted across cold starts; deleted after payment confirms
+model BookingDraft {
+  id        String   @id
+  data      String   // JSON blob of the booking draft
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Attendance {
+  id          String    @id @default(cuid())
+  bookingId   String
+  classroomId String
+  date        DateTime
+  status      String    @default("PRESENT") // "PRESENT" | "ABSENT" | "EXCUSED"
+  markedAt    DateTime?
+  markedBy    String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  booking     Booking   @relation(fields: [bookingId], references: [id])
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  @@unique([bookingId, date])
+  @@index([classroomId, date])
+}
+
+model ParentAccount {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String   @unique
+  email        String?  @unique
+  passwordHash String?
+  isVerified   Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([phone])
+}
+
+model PhoneOTP {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
