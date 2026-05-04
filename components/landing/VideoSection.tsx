@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Play, X, Cpu, Palette, BookOpen, Zap } from "lucide-react"
 import type { Locale } from "@/types/i18n"
-import { t } from "@/lib/i18n"
 
 const CAMP_VIDEO_URL = process.env.NEXT_PUBLIC_CAMP_VIDEO_URL ?? ""
 
@@ -91,15 +90,15 @@ export default function VideoSection({ locale }: { locale: Locale }) {
             <button
               onClick={() => setPlaying(true)}
               className="group mb-4 flex size-20 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/40 backdrop-blur-sm transition hover:scale-110 hover:bg-white/30 sm:size-24"
-              aria-label={t("hero.video.play", locale)}
+              aria-label={isAr ? "شاهد قصتنا" : "Watch Our Story"}
             >
               <Play className="ms-1 size-8 fill-white text-white drop-shadow sm:size-10" />
             </button>
             <p className="text-lg font-bold text-white drop-shadow">
-              {t("hero.video.play", locale)}
+              {isAr ? "شاهد قصتنا" : "Watch Our Story"}
             </p>
             <p className="mt-1 text-sm text-blue-200">
-              {isAr ? "سيتوفر قريباً · صيف 2025" : "Coming soon · Summer 2025"}
+              {isAr ? "سيتوفر قريباً · صيف 2026" : "Coming soon · Summer 2026"}
             </p>
           </div>
         </div>

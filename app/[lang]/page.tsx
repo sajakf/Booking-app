@@ -3,356 +3,304 @@ import Image from "next/image"
 import { isValidLocale, t } from "@/lib/i18n"
 import type { Locale } from "@/types/i18n"
 import { LanguageToggle } from "@/components/layout/LanguageToggle"
-import { classrooms, weeks } from "@/lib/mock-data/classrooms"
-import { ChevronRight, ChevronLeft, MapPin, Calendar, Star, Shield, Clock, Users } from "lucide-react"
-import VideoSection from "@/components/landing/VideoSection"
+import { weeks } from "@/lib/mock-data/classrooms"
+import {
+  MapPin, Calendar, FlaskConical, Microscope, Atom,
+  Zap, Leaf, Calculator, Star, Users, Shield, Clock,
+} from "lucide-react"
+import OTPRegisterForm from "@/components/landing/OTPRegisterForm"
 
-// ── Creative camp logo ──────────────────────────────────────────────────────
-function CampLogo({ className }: { className?: string }) {
+// ── Science Club logo ──────────────────────────────────────────────────────
+function ScienceLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden>
-      <circle cx="24" cy="24" r="22" fill="#1D4ED8" />
-      <path d="M24 8 L27.5 18H38L29.5 24.5L33 35L24 28.5L15 35L18.5 24.5L10 18H20.5L24 8Z"
-        fill="#FCD34D" />
-      <circle cx="24" cy="24" r="6" fill="#1D4ED8" />
-      <circle cx="24" cy="24" r="3" fill="#FCD34D" />
+      <circle cx="24" cy="24" r="22" fill="#0EA5E9" />
+      {/* Flask body */}
+      <path d="M18 10 h12 v2 l5 14 a8 8 0 1 1-22 0 l5-14 z" fill="none" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* Flask liquid */}
+      <path d="M15.5 26 a8 8 0 1 1 17 0 z" fill="white" fillOpacity="0.7"/>
+      {/* Bubbles */}
+      <circle cx="21" cy="30" r="1.5" fill="white" />
+      <circle cx="26" cy="28" r="1" fill="white" />
+      <circle cx="24" cy="32" r="1" fill="white" />
     </svg>
   )
 }
 
-// ── Activity meta per classroom ─────────────────────────────────────────────
-const ACTIVITY_PHOTOS: Record<string, { photo: string; gradient: string }> = {
-  "room-robots-boys": {
-    photo: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=600&q=80",
-    gradient: "from-blue-600/80 to-indigo-700/80",
-  },
-  "room-arts-girls": {
-    photo: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=600&q=80",
-    gradient: "from-pink-500/80 to-rose-600/80",
-  },
-  "room-lang-girls": {
-    photo: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80",
-    gradient: "from-emerald-500/80 to-teal-600/80",
-  },
-  "room-sports-boys": {
-    photo: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
-    gradient: "from-orange-500/80 to-amber-600/80",
-  },
-}
-function activityPhoto(id: string) {
-  return ACTIVITY_PHOTOS[id] ?? { photo: "", gradient: "from-blue-600/80 to-indigo-700/80" }
-}
+// ── Science subject tracks ─────────────────────────────────────────────────
+const SUBJECTS_EN = [
+  { icon: FlaskConical, color: "bg-blue-500",    label: "Chemistry Lab",     desc: "Safe, fun experiments with real reactions" },
+  { icon: Microscope,   color: "bg-purple-500",  label: "Biology & Life",    desc: "Explore cells, plants, and living systems" },
+  { icon: Atom,         color: "bg-cyan-500",    label: "Physics & Energy",  desc: "Forces, motion, light, and electricity" },
+  { icon: Zap,          color: "bg-yellow-500",  label: "Electronics & AI",  desc: "Build circuits and discover AI basics" },
+  { icon: Leaf,         color: "bg-green-500",   label: "Earth & Space",     desc: "Planets, weather, and our environment" },
+  { icon: Calculator,   color: "bg-orange-500",  label: "Math Puzzles",      desc: "Logic games and problem-solving challenges" },
+]
+const SUBJECTS_AR = [
+  { icon: FlaskConical, color: "bg-blue-500",    label: "مختبر الكيمياء",    desc: "تجارب آمنة وممتعة مع تفاعلات حقيقية" },
+  { icon: Microscope,   color: "bg-purple-500",  label: "البيولوجيا والحياة", desc: "استكشف الخلايا والنباتات وأنظمة الحياة" },
+  { icon: Atom,         color: "bg-cyan-500",    label: "الفيزياء والطاقة",  desc: "القوى والحركة والضوء والكهرباء" },
+  { icon: Zap,          color: "bg-yellow-500",  label: "الإلكترونيات والذكاء الاصطناعي", desc: "ابنِ دوائر واكتشف أساسيات الذكاء الاصطناعي" },
+  { icon: Leaf,         color: "bg-green-500",   label: "الأرض والفضاء",    desc: "الكواكب والطقس وبيئتنا" },
+  { icon: Calculator,   color: "bg-orange-500",  label: "ألغاز الرياضيات",  desc: "ألعاب منطقية وتحديات حل المشكلات" },
+]
 
 export default async function LandingPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
   const locale: Locale = isValidLocale(lang) ? lang : "en"
   const isAr = locale === "ar"
-  const ChevronNext = isAr ? ChevronLeft : ChevronRight
 
-  const minPrice = Math.min(...classrooms.map((c) => c.pricePerDay))
+  const subjects = isAr ? SUBJECTS_AR : SUBJECTS_EN
 
-  const testimonials = isAr
-    ? [
-        { name: "نورة الصباح",     role: "أم لطفلين",           text: "كان أحمد متحمساً لكل يوم. تطور كثيراً في مهارات الروبوت ويسأل متى يعود!" },
-        { name: "محمد العنزي",      role: "والد",                 text: "المدربون محترفون والجو آمن. بنتي أحبّت مشاركة لوحاتها مع الأسرة كل مساء." },
-        { name: "لطيفة المطيري",   role: "أم",                   text: "أفضل استثمار لهذا الصيف. تعلّمت ابنتي اللغة وهي تلعب وتضحك." },
-      ]
-    : [
-        { name: "Noura Al-Sabah",   role: "Mother of two",       text: "Ahmad was excited every single morning. He grew so much in robotics and keeps asking when camp starts again!" },
-        { name: "Mohammed Al-Enezi",role: "Father",               text: "The instructors are professional and the environment is safe. My daughter loves sharing her artwork every evening." },
-        { name: "Latifa Al-Mutairi",role: "Mother",               text: "Best investment of the summer. My daughter learned English while playing and laughing the whole week." },
-      ]
+  const features = [
+    { icon: FlaskConical, key: "feature1" },
+    { icon: Users,        key: "feature2" },
+    { icon: Shield,       key: "feature3" },
+    { icon: Clock,        key: "feature4" },
+  ] as const
 
   return (
-    <div className="min-h-screen bg-white font-sans antialiased">
+    <div className="min-h-screen bg-white antialiased" dir={isAr ? "rtl" : "ltr"}>
 
-      {/* ── HEADER ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-white/60 bg-white/95 shadow-sm backdrop-blur-md">
+      {/* ── TOPBAR ──────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          {/* Logo */}
+          {/* Logo + name */}
           <Link href={`/${locale}`} className="flex items-center gap-2.5">
-            <CampLogo className="size-10 shrink-0" />
-            <span className="hidden text-sm font-extrabold tracking-tight text-gray-900 sm:block">
-              {isAr ? "مخيم النجوم الصغيرة" : "Little Stars Camp"}
-            </span>
+            <ScienceLogo className="size-9 shrink-0" />
+            <div className="hidden sm:block">
+              <p className="text-xs font-bold leading-none text-blue-600 uppercase tracking-wide">
+                {isAr ? "نادي العلوم الصيفي" : "Summer Science Club"}
+              </p>
+              <p className="text-[10px] text-gray-400 leading-none mt-0.5">2026</p>
+            </div>
           </Link>
 
-          {/* Nav actions */}
-          <div className="flex items-center gap-2">
-            <LanguageToggle />
-            <Link
-              href={`/${locale}/signup`}
-              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              {t("nav.signup", locale)}
-            </Link>
-          </div>
+          {/* Language toggle — top right */}
+          <LanguageToggle />
         </div>
       </header>
 
-      {/* ── HERO ────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white">
-        {/* Background photo with dark overlay */}
+      {/* ── HERO ────────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-cyan-900 text-white">
+        {/* Background science photo */}
         <Image
-          src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=1600&q=80"
+          src="https://images.unsplash.com/photo-1532094349884-543559373ef0?w=1600&q=70"
           alt=""
           fill
-          className="object-cover opacity-15"
+          className="object-cover opacity-10"
           priority
           sizes="100vw"
         />
-        {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -left-20 -top-20 size-96 rounded-full bg-white/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 size-96 rounded-full bg-yellow-300/10 blur-3xl" />
 
-        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            {/* Badge */}
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-medium backdrop-blur-sm ring-1 ring-white/20">
-              <Calendar className="size-4" />
-              {isAr ? weeks[0]?.labelAr : weeks[0]?.label}
-            </div>
-
-            <h1 className="mb-4 text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
-              {isAr ? "مخيم النجوم الصغيرة" : "Little Stars Camp"}
-            </h1>
-
-            <p className="mb-3 text-xl font-medium text-blue-100 sm:text-2xl">
-              {t("hero.tagline", locale)}
-            </p>
-
-            <p className="mb-2 text-base text-blue-200">
-              <MapPin className="me-1 inline size-4" />
-              {isAr ? "السالمية، الكويت" : "Salmiya, Kuwait"}
-            </p>
-
-            <p className="mb-10 text-base text-blue-200">
-              {t("hero.price_from", locale)}{" "}
-              <span className="text-xl font-bold text-yellow-300">
-                {minPrice.toFixed(3)} {isAr ? "د.ك" : "KD"}
-              </span>{" "}
-              {t("hero.per_day", locale)}
-            </p>
-
-            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link
-                href={`/${locale}/book/classroom`}
-                className="inline-flex items-center gap-2 rounded-2xl bg-yellow-400 px-8 py-4 text-lg font-bold text-gray-900 shadow-lg shadow-yellow-400/30 transition hover:bg-yellow-300 hover:scale-105 active:scale-95"
-              >
-                {t("hero.cta", locale)}
-                <ChevronNext className="size-5" />
-              </Link>
-              <Link
-                href={`/${locale}/signup`}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                {t("nav.signup", locale)}
-                <ChevronNext className="size-5" />
-              </Link>
-            </div>
-          </div>
+        {/* Decorative floating atoms */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-16 -left-16 size-80 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="absolute top-1/3 -right-20 size-96 rounded-full bg-blue-500/10 blur-3xl" />
+          <div className="absolute -bottom-20 left-1/4 size-72 rounded-full bg-cyan-400/10 blur-3xl" />
         </div>
-      </section>
 
-      {/* ── STATS BAR ────────────────────────────────────────────────── */}
-      <section className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-0 divide-x divide-gray-100 sm:grid-cols-4">
-          {[
-            { value: "250+", label: t("hero.stats.kids", locale) },
-            { value: "8",    label: t("hero.stats.activities", locale) },
-            { value: "10",   label: t("hero.stats.instructors", locale) },
-            { value: "4.9★", label: t("hero.stats.rating", locale) },
-          ].map(({ value, label }) => (
-            <div key={label} className="flex flex-col items-center justify-center px-4 py-8 text-center">
-              <span className="text-3xl font-black text-blue-700">{value}</span>
-              <span className="mt-1 text-xs font-medium text-gray-500">{label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
 
-      {/* ── FEATURES ─────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {[
-            { icon: Users,  title: t("hero.feature1", locale), desc: isAr ? "مدربون حاصلون على شهادات معتمدة ولديهم شغف حقيقي بتعليم الأطفال" : "Certified instructors with a genuine passion for teaching young minds" },
-            { icon: Shield, title: t("hero.feature2", locale), desc: isAr ? "مجموعات لا تتجاوز 15 طفلاً لضمان الاهتمام الشخصي لكل طفل" : "Groups capped at 15 kids for personalised attention every session" },
-            { icon: Clock,  title: t("hero.feature3", locale), desc: isAr ? "برامج صباحية ومسائية تناسب جدول كل عائلة طوال الأسبوع" : "Morning and afternoon sessions to fit every family's schedule all week" },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:shadow-md">
-              <div className="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-blue-50">
-                <Icon className="size-6 text-blue-600" />
+            {/* ── Left: Headline ── */}
+            <div>
+              {/* Badge */}
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm font-medium text-cyan-300 backdrop-blur-sm">
+                <Calendar className="size-4" />
+                {t("hero.dates", locale)}
               </div>
-              <h3 className="mb-2 text-base font-bold text-gray-900">{title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* ── VIDEO SECTION ─────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-50 py-20">
-        <div className="mx-auto max-w-4xl px-4">
-          <div className="mb-10 text-center">
-            <h2 className="mb-3 text-3xl font-black text-gray-900 sm:text-4xl">
-              {t("hero.video.title", locale)}
-            </h2>
-            <p className="text-gray-500">{t("hero.video.subtitle", locale)}</p>
-          </div>
-          <VideoSection locale={locale} />
-        </div>
-      </section>
+              <h1 className="mb-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                {isAr ? (
+                  <>
+                    نادي العلوم<br />
+                    <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">الصيفي 2026</span>
+                  </>
+                ) : (
+                  <>
+                    Summer Science<br />
+                    <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Club 2026</span>
+                  </>
+                )}
+              </h1>
 
-      {/* ── CLASSROOM GALLERY ─────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="mb-12 text-center">
-          <h2 className="mb-3 text-3xl font-black text-gray-900 sm:text-4xl">
-            {t("hero.classrooms.title", locale)}
-          </h2>
-          <p className="text-gray-500">{t("hero.classrooms.subtitle", locale)}</p>
-        </div>
+              <p className="mb-6 text-lg text-blue-200 leading-relaxed">
+                {t("hero.tagline", locale)}
+              </p>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {classrooms.map((room) => {
-            const ap = activityPhoto(room.id)
-            const name = isAr ? room.nameAr : room.name
-            const minSeats = Math.min(...room.days.map((d) => d.seatsRemaining))
-            const isFull = minSeats === 0
-            const genderLabel = isAr
-              ? room.gender === "boys" ? "بنين" : room.gender === "girls" ? "بنات" : "مختلط"
-              : room.gender === "boys" ? "Boys" : room.gender === "girls" ? "Girls" : "Mixed"
+              {/* Meta pills */}
+              <div className="flex flex-wrap gap-3 text-sm">
+                <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-white/80">
+                  <MapPin className="size-3.5 text-cyan-400" />
+                  {t("hero.location", locale)}
+                </span>
+                <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-white/80">
+                  <Users className="size-3.5 text-cyan-400" />
+                  {t("hero.ages_range", locale)}
+                </span>
+                <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-white/80">
+                  <Calendar className="size-3.5 text-cyan-400" />
+                  {isAr ? weeks[0]?.labelAr : weeks[0]?.label}
+                </span>
+              </div>
 
-            return (
-              <Link
-                key={room.id}
-                href={`/${locale}/book/classroom`}
-                className="group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                {/* Classroom photo */}
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={ap.photo}
-                    alt={name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                  {/* Subtle gradient overlay so text badges are legible */}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${ap.gradient} opacity-40`} />
-                  {/* Gender badge */}
-                  <span className="absolute end-3 top-3 rounded-full bg-black/40 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
-                    {genderLabel}
-                  </span>
-                  {/* Seats badge */}
-                  {!isFull && minSeats <= 5 && (
-                    <span className="absolute start-3 top-3 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-bold text-white shadow">
-                      {isAr ? `${minSeats} متبقي` : `${minSeats} left`}
-                    </span>
-                  )}
-                  {isFull && (
-                    <span className="absolute start-3 top-3 rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-bold text-white shadow">
-                      {t("step2.full", locale)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex flex-1 flex-col p-4">
-                  <h3 className="mb-1 text-sm font-bold text-gray-900 leading-snug">{name}</h3>
-                  <p className="mb-3 text-xs text-gray-500">
-                    {t("hero.ages", locale)} {room.ageRange[0]}–{room.ageRange[1]}
-                  </p>
-
-                  <div className="mt-auto flex items-center justify-between">
-                    <div>
-                      <span className="text-base font-black text-blue-700">
-                        {room.pricePerDay.toFixed(3)}
-                      </span>
-                      <span className="ms-1 text-xs text-gray-400">
-                        {isAr ? "د.ك/يوم" : "KD/day"}
-                      </span>
-                    </div>
-                    <span className="rounded-xl bg-blue-600 px-3 py-1 text-xs font-bold text-white transition group-hover:bg-blue-700">
-                      {t("hero.book_now", locale)}
-                    </span>
+              {/* Stats row */}
+              <div className="mt-8 grid grid-cols-4 gap-4 border-t border-white/10 pt-8">
+                {[
+                  { value: "300+", label: t("hero.stats.kids", locale) },
+                  { value: "50+",  label: t("hero.stats.activities", locale) },
+                  { value: "12",   label: t("hero.stats.instructors", locale) },
+                  { value: "4.9★", label: t("hero.stats.rating", locale) },
+                ].map(({ value, label }) => (
+                  <div key={label} className="text-center">
+                    <p className="text-2xl font-black text-cyan-400">{value}</p>
+                    <p className="mt-0.5 text-xs text-blue-300 leading-tight">{label}</p>
                   </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </section>
+                ))}
+              </div>
+            </div>
 
-      {/* ── TESTIMONIALS ──────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-yellow-50 via-orange-50 to-amber-50 py-20">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-black text-gray-900 sm:text-4xl">
-              {t("hero.testimonials.title", locale)}
-            </h2>
-            <p className="text-gray-500">{t("hero.testimonials.subtitle", locale)}</p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            {testimonials.map((item) => (
-              <div key={item.name} className="rounded-2xl bg-white p-6 shadow-sm">
-                <div className="mb-3 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="size-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="mb-4 text-sm text-gray-700 leading-relaxed">"{item.text}"</p>
-                <div className="flex items-center gap-3">
-                  {/* Creative avatar */}
-                  <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white">
-                    {item.name.charAt(0)}
+            {/* ── Right: Registration Card ── */}
+            <div className="lg:flex lg:justify-end">
+              <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/95 p-7 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                {/* Card header */}
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 shadow-lg">
+                    <FlaskConical className="size-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">{item.name}</p>
-                    <p className="text-xs text-gray-400">{item.role}</p>
+                    <p className="text-sm font-black text-gray-900">
+                      {t("hero.register_heading", locale)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {isAr ? "نادي العلوم الصيفي 2026" : "Summer Science Club 2026"}
+                    </p>
                   </div>
                 </div>
+
+                {/* OTP form */}
+                <OTPRegisterForm locale={locale} />
               </div>
-            ))}
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ─────────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-r from-blue-700 to-indigo-700 py-20 text-white">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <CampLogo className="mx-auto mb-6 size-16" />
-          <h2 className="mb-4 text-3xl font-black sm:text-4xl">
-            {isAr ? "ابدأ رحلة طفلك هذا الصيف" : "Start Your Child's Journey This Summer"}
+      {/* ── WHY CHOOSE US ───────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ icon: Icon, key }) => (
+            <div key={key} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm hover:shadow-md transition">
+              <div className="mb-3 inline-flex size-11 items-center justify-center rounded-xl bg-blue-50">
+                <Icon className="size-5 text-blue-600" />
+              </div>
+              <h3 className="mb-1 text-sm font-bold text-gray-900">
+                {t(`hero.${key}_title` as never, locale)}
+              </h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                {t(`hero.${key}_desc` as never, locale)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SCIENCE SUBJECTS ────────────────────────────────────────────────── */}
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="mb-12 text-center">
+            <h2 className="mb-2 text-3xl font-black text-gray-900 sm:text-4xl">
+              {t("hero.subjects_title", locale)}
+            </h2>
+            <p className="text-gray-500">{t("hero.subjects_sub", locale)}</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {subjects.map((s) => {
+              const Icon = s.icon
+              return (
+                <div key={s.label} className="flex items-start gap-4 rounded-2xl border border-white bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${s.color} shadow-sm`}>
+                    <Icon className="size-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900">{s.label}</p>
+                    <p className="mt-0.5 text-sm text-gray-500 leading-snug">{s.desc}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CLASSROOM PHOTOS ────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-20">
+        <div className="mb-10 text-center">
+          <h2 className="mb-2 text-3xl font-black text-gray-900 sm:text-4xl">
+            {isAr ? "داخل المختبرات" : "Inside Our Labs"}
+          </h2>
+          <p className="text-gray-500">
+            {isAr ? "مساحات مجهزة بالكامل لتجارب العلوم الحقيقية" : "Fully equipped spaces for real science experiments"}
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { src: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&q=80", label: isAr ? "مختبر الكيمياء" : "Chemistry Lab" },
+            { src: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=600&q=80", label: isAr ? "مختبر الأحياء" : "Biology Lab" },
+            { src: "https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80", label: isAr ? "مختبر الإلكترونيات" : "Electronics Lab" },
+          ].map(({ src, label }) => (
+            <div key={label} className="group relative overflow-hidden rounded-2xl shadow-md">
+              <div className="relative h-52">
+                <Image
+                  src={src}
+                  alt={label}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <p className="absolute bottom-3 start-4 text-sm font-bold text-white">{label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ────────────────────────────────────────────────────────── */}
+      <section className="bg-gradient-to-r from-slate-900 via-blue-950 to-cyan-900 py-20 text-white">
+        <div className="mx-auto max-w-xl px-4 text-center">
+          <ScienceLogo className="mx-auto mb-6 size-16" />
+          <h2 className="mb-3 text-3xl font-black sm:text-4xl">
+            {isAr ? "احجز مقعد طفلك الآن" : "Secure Your Child's Spot"}
           </h2>
           <p className="mb-8 text-blue-200">
-            {isAr
-              ? "أماكن محدودة — احجز الآن قبل نفاد المقاعد"
-              : "Limited seats available — secure your spot before it's gone"}
+            {t("hero.cta_sub", locale)}
           </p>
           <Link
-            href={`/${locale}/book/classroom`}
-            className="inline-flex items-center gap-2 rounded-2xl bg-yellow-400 px-10 py-4 text-lg font-bold text-gray-900 shadow-xl shadow-yellow-400/30 transition hover:bg-yellow-300 hover:scale-105"
+            href={`/${locale}/signup`}
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 px-10 py-4 text-lg font-bold text-white shadow-xl shadow-cyan-500/30 transition hover:opacity-90 hover:scale-105"
           >
             {t("hero.cta", locale)}
-            <ChevronNext className="size-5" />
           </Link>
         </div>
       </section>
 
-      {/* ── FOOTER ────────────────────────────────────────────────────── */}
+      {/* ── FOOTER ──────────────────────────────────────────────────────────── */}
       <footer className="border-t border-gray-100 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-gray-500 sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500 sm:flex-row">
           <div className="flex items-center gap-2">
-            <CampLogo className="size-6" />
+            <ScienceLogo className="size-6" />
             <span className="font-semibold text-gray-700">
-              {isAr ? "مخيم النجوم الصغيرة" : "Little Stars Camp"}
+              {isAr ? "نادي العلوم الصيفي 2026" : "Summer Science Club 2026"}
             </span>
           </div>
-          <span>
-            <MapPin className="me-1 inline size-3.5" />
+          <span className="flex items-center gap-1">
+            <MapPin className="size-3.5" />
             {t("hero.footer.location", locale)}
           </span>
-          <span>© 2025 · {t("hero.footer.rights", locale)}</span>
+          <span>© 2026 · {t("hero.footer.rights", locale)}</span>
         </div>
       </footer>
     </div>
