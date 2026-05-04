@@ -5,206 +5,165 @@ import { useRouter } from "next/navigation"
 import { useBooking } from "@/context/BookingContext"
 import { useLocale } from "@/hooks/useLocale"
 import { BookingShell } from "@/components/layout/BookingShell"
-import { PhoneInput } from "@/components/shared/PhoneInput"
-import { detailsSchema } from "@/lib/validators"
+import { isValidLocale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
-import { User, Heart } from "lucide-react"
-import { AIChatWidget } from "@/components/shared/AIChatWidget"
+import { User, Heart, AlertCircle, Sparkles } from "lucide-react"
+import type { Locale } from "@/types/i18n"
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null
-  return <p className="mt-1 text-xs text-red-600">{message}</p>
-}
-
-function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
-  return (
-    <label className="mb-1.5 block text-sm font-medium text-gray-700">
-      {children}
-      {required && <span className="ms-0.5 text-red-500">*</span>}
-    </label>
-  )
-}
-
-const inputClass = "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+const KUWAIT_MOBILE_RE = /^[569]\d{7}$/
 
 export default function DetailsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params)
+  const locale: Locale = isValidLocale(lang) ? lang : "en"
   const router = useRouter()
   const { state, dispatch } = useBooking()
   const { t } = useLocale()
+  const isAr = locale === "ar"
 
-  const [childName, setChildName] = useState(state.child?.name ?? "")
-  const [childAge, setChildAge] = useState<number>(state.child?.age ?? 6)
-  const [childGender, setChildGender] = useState<"male" | "female">(state.child?.gender ?? "male")
   const [parentName, setParentName] = useState(state.parent?.name ?? "")
   const [parentMobile, setParentMobile] = useState(state.parent?.mobile ?? "")
   const [parentEmail, setParentEmail] = useState(state.parent?.email ?? "")
   const [medicalNotes, setMedicalNotes] = useState(state.medicalNotes ?? "")
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  if (!state.selectedClassroomId || state.selectedDays.length === 0) {
-    router.replace(`/${lang}/book/schedule`)
+  // Guard — must have previous steps done
+  if (!state.child || state.selectedWorkshopIds.length === 0 || !state.selectedSessionId) {
+    if (typeof window !== "undefined") {
+      if (!state.child) router.replace(`/${locale}/book/child`)
+      else if (state.selectedWorkshopIds.length === 0) router.replace(`/${locale}/book/workshops`)
+      else router.replace(`/${locale}/book/weeks`)
+    }
     return null
   }
 
-  const handleSubmit = () => {
-    const result = detailsSchema.safeParse({
-      child: { name: childName, age: childAge, gender: childGender },
-      parent: { name: parentName, mobile: parentMobile, email: parentEmail },
-      medicalNotes,
-    })
+  const mobileDigits = parentMobile.replace(/\D/g, "").slice(0, 8)
 
-    if (!result.success) {
-      const errs: Record<string, string> = {}
-      result.error.issues.forEach((e) => {
-        const key = e.path.join(".")
-        errs[key] = e.message
-      })
-      setErrors(errs)
-      return
+  const validate = () => {
+    const e: Record<string, string> = {}
+    if (!parentName.trim() || parentName.trim().length < 2) {
+      e.parentName = isAr ? "الاسم مطلوب (حرفان على الأقل)" : "Name is required (min 2 chars)"
     }
+    if (!KUWAIT_MOBILE_RE.test(mobileDigits)) {
+      e.parentMobile = t("error.phone")
+    }
+    if (parentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail)) {
+      e.parentEmail = t("error.email")
+    }
+    return e
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const errs = validate()
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
 
     dispatch({
-      type: "SET_CHILD_DETAILS",
-      child: result.data.child,
-      parent: result.data.parent,
-      medicalNotes: result.data.medicalNotes,
+      type: "SET_PARENT_DETAILS",
+      parent: { name: parentName.trim(), mobile: mobileDigits, email: parentEmail.trim() },
+      medicalNotes: medicalNotes.trim(),
     })
-    router.push(`/${lang}/book/review`)
+    router.push(`/${locale}/book/review`)
   }
 
   return (
-    <BookingShell
-      step={3}
-      title={t("step4.title")}
-      subtitle={t("step4.subtitle")}
-      backHref={`/${lang}/book/schedule`}
-    >
-      <form autoComplete="off" onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className="space-y-6">
-        {/* Child info */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-              <User className="size-4" />
-            </div>
-            <h2 className="font-semibold text-gray-900">{t("step4.child.heading")}</h2>
-          </div>
+    <BookingShell step={4} backHref={`/${locale}/book/weeks`}>
 
-          <div className="space-y-4">
-            <div>
-              <Label required>{t("step4.child.name")}</Label>
-              <input
-                type="text"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
-                dir="auto"
-                autoComplete="off"
-                className={cn(inputClass, errors["child.name"] && "border-red-400")}
-                placeholder="e.g. Ahmad Al-Rashidi"
-              />
-              <FieldError message={errors["child.name"]} />
-            </div>
+      {/* Header */}
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{t("step4.title")}</h1>
+        <p className="mt-1.5 text-blue-200">{t("step4.subtitle")}</p>
+      </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label required>{t("step4.child.age")}</Label>
-                <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
-                  <button
-                    onClick={() => setChildAge((v) => Math.max(1, v - 1))}
-                    className="flex size-10 shrink-0 items-center justify-center border-e border-gray-300 bg-gray-50 text-lg font-bold text-gray-600 hover:bg-gray-100"
-                  >
-                    –
-                  </button>
-                  <span className="flex-1 text-center text-sm font-semibold">{childAge}</span>
-                  <button
-                    onClick={() => setChildAge((v) => Math.min(18, v + 1))}
-                    className="flex size-10 shrink-0 items-center justify-center border-s border-gray-300 bg-gray-50 text-lg font-bold text-gray-600 hover:bg-gray-100"
-                  >
-                    +
-                  </button>
-                </div>
-                <FieldError message={errors["child.age"]} />
-              </div>
-
-              <div>
-                <Label required>{t("step4.child.gender")}</Label>
-                <div className="flex gap-2">
-                  {(["male", "female"] as const).map((g) => (
-                    <button
-                      key={g}
-                      onClick={() => setChildGender(g)}
-                      className={cn(
-                        "flex-1 rounded-lg border-2 py-2 text-sm font-medium transition-all",
-                        childGender === g
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
-                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-300",
-                      )}
-                    >
-                      {g === "male" ? t("step4.child.gender.male") : t("step4.child.gender.female")}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Child summary pill */}
+      <div className="mb-5 flex items-center justify-center">
+        <div className="flex items-center gap-2 rounded-2xl bg-white/10 border border-white/15 px-4 py-2">
+          <span className="text-lg">{state.child.gender === "male" ? "👦" : "👧"}</span>
+          <span className="font-bold text-white">{state.child.name}</span>
+          <span className="text-white/50">·</span>
+          <span className="text-white/70 text-sm">{state.child.age} {isAr ? "سنة" : "yrs"}</span>
         </div>
+      </div>
 
-        {/* Parent info */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-full bg-purple-100 text-purple-600">
-              <User className="size-4" />
+      <form autoComplete="off" onSubmit={handleSubmit} className="space-y-5">
+
+        {/* Parent info card */}
+        <div className="rounded-3xl bg-white/5 border border-white/10 p-5 space-y-5">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 items-center justify-center rounded-full bg-violet-400/20">
+              <User className="size-4 text-violet-300" />
             </div>
-            <h2 className="font-semibold text-gray-900">{t("step4.parent.heading")}</h2>
+            <h2 className="font-bold text-white">{t("step4.parent.heading")}</h2>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label required>{t("step4.parent.name")}</Label>
+          {/* Parent name */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-blue-200">{t("step4.parent.name")}</label>
+            <input
+              type="text"
+              value={parentName}
+              onChange={(e) => { setParentName(e.target.value); setErrors((p) => ({ ...p, parentName: "" })) }}
+              autoComplete="off"
+              dir="auto"
+              placeholder={isAr ? "الاسم الكامل لولي الأمر" : "Parent's full name"}
+              className={cn(
+                "w-full rounded-2xl border-2 bg-white/10 px-4 py-3 text-white placeholder:text-white/30 outline-none transition",
+                "focus:border-violet-400 focus:bg-white/15",
+                errors.parentName ? "border-red-400" : "border-white/20"
+              )}
+            />
+            {errors.parentName && <Err msg={errors.parentName} />}
+          </div>
+
+          {/* Mobile */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-blue-200">{t("step4.parent.mobile")}</label>
+            <div className="flex overflow-hidden rounded-2xl border-2 border-white/20 bg-white/10 transition focus-within:border-violet-400 focus-within:bg-white/15">
+              <span className="flex items-center gap-1.5 border-e border-white/20 bg-white/10 px-4 text-sm font-bold text-white/70 shrink-0">
+                🇰🇼 +965
+              </span>
               <input
-                type="text"
-                value={parentName}
-                onChange={(e) => setParentName(e.target.value)}
-                dir="auto"
+                type="tel"
+                inputMode="numeric"
+                value={mobileDigits}
+                onChange={(e) => { setParentMobile(e.target.value.replace(/\D/g, "").slice(0, 8)); setErrors((p) => ({ ...p, parentMobile: "" })) }}
                 autoComplete="off"
-                className={cn(inputClass, errors["parent.name"] && "border-red-400")}
-                placeholder="e.g. Mohammed Al-Rashidi"
-              />
-              <FieldError message={errors["parent.name"]} />
-            </div>
-
-            <div>
-              <Label required>{t("step4.parent.mobile")}</Label>
-              <PhoneInput
-                value={parentMobile}
-                onChange={setParentMobile}
-                error={errors["parent.mobile"]}
-              />
-            </div>
-
-            <div>
-              <Label required>{t("step4.parent.email")}</Label>
-              <input
-                type="email"
-                value={parentEmail}
-                onChange={(e) => setParentEmail(e.target.value)}
                 dir="ltr"
-                autoComplete="off"
-                className={cn(inputClass, errors["parent.email"] && "border-red-400")}
-                placeholder="parent@example.com"
+                placeholder="5X XXX XXXX"
+                className="flex-1 bg-transparent px-4 py-3 text-white placeholder:text-white/30 outline-none"
               />
-              <FieldError message={errors["parent.email"]} />
             </div>
+            {errors.parentMobile && <Err msg={errors.parentMobile} />}
+          </div>
+
+          {/* Email (optional) */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-blue-200">
+              {t("step4.parent.email")}
+            </label>
+            <input
+              type="email"
+              value={parentEmail}
+              onChange={(e) => { setParentEmail(e.target.value); setErrors((p) => ({ ...p, parentEmail: "" })) }}
+              autoComplete="off"
+              dir="ltr"
+              placeholder="email@example.com"
+              className={cn(
+                "w-full rounded-2xl border-2 bg-white/10 px-4 py-3 text-white placeholder:text-white/30 outline-none transition",
+                "focus:border-violet-400 focus:bg-white/15",
+                errors.parentEmail ? "border-red-400" : "border-white/20"
+              )}
+            />
+            {errors.parentEmail && <Err msg={errors.parentEmail} />}
           </div>
         </div>
 
-        {/* Medical notes */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-full bg-red-100 text-red-500">
-              <Heart className="size-4" />
+        {/* Medical notes card */}
+        <div className="rounded-3xl bg-white/5 border border-white/10 p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 items-center justify-center rounded-full bg-red-400/20">
+              <Heart className="size-4 text-red-300" />
             </div>
-            <h2 className="font-semibold text-gray-900">{t("step4.medical.heading")}</h2>
+            <h2 className="font-bold text-white">{t("step4.medical.heading")}</h2>
           </div>
           <textarea
             value={medicalNotes}
@@ -212,20 +171,27 @@ export default function DetailsPage({ params }: { params: Promise<{ lang: string
             rows={3}
             dir="auto"
             placeholder={t("step4.medical.placeholder")}
-            className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
+            className="w-full resize-none rounded-2xl border-2 border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/30 outline-none transition focus:border-violet-400 focus:bg-white/15 text-sm"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full rounded-2xl bg-blue-600 py-4 text-base font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.98]"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-yellow-400 py-4 text-base font-extrabold text-[#0a1628] shadow-lg shadow-yellow-400/30 transition hover:bg-yellow-300 active:scale-[0.98]"
         >
+          <Sparkles className="size-5" />
           {t("step4.continue")}
         </button>
       </form>
-
-      {/* AI chat assistant — always available during registration */}
-      <AIChatWidget locale={lang === "ar" ? "ar" : "en"} />
     </BookingShell>
+  )
+}
+
+function Err({ msg }: { msg: string }) {
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-red-400">
+      <AlertCircle className="size-3.5 shrink-0" />
+      {msg}
+    </p>
   )
 }

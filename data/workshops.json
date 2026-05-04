@@ -1,0 +1,247 @@
+{
+  "clubName": "Summer Science Club 2026",
+  "clubNameAr": "نادي العلوم الصيفي 2026",
+  "location": "Salmiya, Kuwait",
+  "locationAr": "السالمية، الكويت",
+
+  "timeSlots": [
+    {
+      "id": "slot-1",
+      "label": "5:00 PM – 6:15 PM",
+      "labelAr": "5:00 م – 6:15 م",
+      "start": "17:00",
+      "end": "18:15"
+    },
+    {
+      "id": "slot-2",
+      "label": "6:45 PM – 8:00 PM",
+      "labelAr": "6:45 م – 8:00 م",
+      "start": "18:45",
+      "end": "20:00"
+    }
+  ],
+
+  "sessions": [
+    {
+      "id": "session-1",
+      "label": "Week 1",
+      "labelAr": "الأسبوع الأول",
+      "dateRange": "Jun 20 – 26, 2026",
+      "dateRangeAr": "20 – 26 يونيو 2026",
+      "startDate": "2026-06-20",
+      "boysDays": ["2026-06-21", "2026-06-23", "2026-06-25"],
+      "girlsDays": ["2026-06-20", "2026-06-22", "2026-06-24"]
+    },
+    {
+      "id": "session-2",
+      "label": "Week 2",
+      "labelAr": "الأسبوع الثاني",
+      "dateRange": "Jul 4 – 10, 2026",
+      "dateRangeAr": "4 – 10 يوليو 2026",
+      "startDate": "2026-07-04",
+      "boysDays": ["2026-07-05", "2026-07-07", "2026-07-09"],
+      "girlsDays": ["2026-07-04", "2026-07-06", "2026-07-08"]
+    },
+    {
+      "id": "session-3",
+      "label": "Week 3",
+      "labelAr": "الأسبوع الثالث",
+      "dateRange": "Jul 18 – 24, 2026",
+      "dateRangeAr": "18 – 24 يوليو 2026",
+      "startDate": "2026-07-18",
+      "boysDays": ["2026-07-19", "2026-07-21", "2026-07-23"],
+      "girlsDays": ["2026-07-18", "2026-07-20", "2026-07-22"]
+    },
+    {
+      "id": "session-4",
+      "label": "Week 4",
+      "labelAr": "الأسبوع الرابع",
+      "dateRange": "Aug 1 – 7, 2026",
+      "dateRangeAr": "1 – 7 أغسطس 2026",
+      "startDate": "2026-08-01",
+      "boysDays": ["2026-08-02", "2026-08-04", "2026-08-06"],
+      "girlsDays": ["2026-08-01", "2026-08-03", "2026-08-05"]
+    },
+    {
+      "id": "session-5",
+      "label": "Week 5",
+      "labelAr": "الأسبوع الخامس",
+      "dateRange": "Aug 15 – 21, 2026",
+      "dateRangeAr": "15 – 21 أغسطس 2026",
+      "startDate": "2026-08-15",
+      "boysDays": ["2026-08-16", "2026-08-18", "2026-08-20"],
+      "girlsDays": ["2026-08-15", "2026-08-17", "2026-08-19"]
+    }
+  ],
+
+  "workshops": [
+    {
+      "id": "3d-printing",
+      "name": "3D Printing",
+      "nameAr": "الطباعة ثلاثية الأبعاد",
+      "description": "Design and print real 3D objects using CAD software and FDM printers.",
+      "descriptionAr": "صمّم وطبع أجساماً ثلاثية الأبعاد حقيقية باستخدام برامج التصميم وطابعات FDM.",
+      "icon": "Printer",
+      "color": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "biology",
+      "name": "Biology",
+      "nameAr": "علم الأحياء",
+      "description": "Explore cells, ecosystems, and the science of living organisms with real microscopes.",
+      "descriptionAr": "استكشف الخلايا والأنظمة البيئية وعلم الكائنات الحية باستخدام مجاهر حقيقية.",
+      "icon": "Microscope",
+      "color": "#059669",
+      "bgLight": "#ECFDF5",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "chemistry",
+      "name": "Chemistry",
+      "nameAr": "الكيمياء",
+      "description": "Safe and exciting chemical experiments — reactions, colours, and everyday science.",
+      "descriptionAr": "تجارب كيميائية آمنة ومثيرة — تفاعلات وألوان وعلوم الحياة اليومية.",
+      "icon": "FlaskConical",
+      "color": "#2563EB",
+      "bgLight": "#EFF6FF",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "electronics",
+      "name": "Electronics",
+      "nameAr": "الإلكترونيات",
+      "description": "Build circuits, program Arduino boards, and discover how electronics power our world.",
+      "descriptionAr": "ابنِ دوائر كهربائية وبرمج لوحات Arduino واكتشف كيف تُشغّل الإلكترونيات عالمنا.",
+      "icon": "Zap",
+      "color": "#D97706",
+      "bgLight": "#FFFBEB",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "space",
+      "name": "Space",
+      "nameAr": "الفضاء",
+      "description": "Journey through the universe — planets, stars, telescopes, and space exploration.",
+      "descriptionAr": "رحلة عبر الكون — كواكب ونجوم وتلسكوبات واستكشاف الفضاء.",
+      "icon": "Telescope",
+      "color": "#1E3A8A",
+      "bgLight": "#EFF6FF",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "photography",
+      "name": "Photography",
+      "nameAr": "التصوير الفوتوغرافي",
+      "description": "Learn composition, lighting, and editing to capture stunning images with real cameras.",
+      "descriptionAr": "تعلّم التأليف والإضاءة والتعديل لالتقاط صور رائعة بكاميرات حقيقية.",
+      "icon": "Camera",
+      "color": "#DB2777",
+      "bgLight": "#FDF2F8",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "planting",
+      "name": "Planting",
+      "nameAr": "الزراعة",
+      "description": "Grow plants from seed, learn soil science, and explore sustainable farming.",
+      "descriptionAr": "ازرع نباتات من البذور وتعلّم علم التربة واستكشف الزراعة المستدامة.",
+      "icon": "Sprout",
+      "color": "#16A34A",
+      "bgLight": "#F0FDF4",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "mechanical-car",
+      "name": "Mechanical Car Engineering",
+      "nameAr": "هندسة السيارات الميكانيكية",
+      "description": "Understand car mechanics — engines, gears, and build your own mini motorised car.",
+      "descriptionAr": "افهم ميكانيكا السيارات — المحركات والتروس وابنِ سيارتك المصغّرة.",
+      "icon": "Cog",
+      "color": "#EA580C",
+      "bgLight": "#FFF7ED",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "journaling",
+      "name": "Journaling",
+      "nameAr": "كتابة اليوميات",
+      "description": "Express creativity through writing, illustration, and storytelling in a science journal.",
+      "descriptionAr": "عبّر عن إبداعك من خلال الكتابة والرسم والتعبير في مجلة علمية خاصة.",
+      "icon": "BookOpen",
+      "color": "#0891B2",
+      "bgLight": "#ECFEFF",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "car-aviation",
+      "name": "Car Aviation",
+      "nameAr": "طيران السيارات",
+      "description": "Explore aerodynamics and design flying cars — the future of transport.",
+      "descriptionAr": "استكشف ديناميكيات الهواء وصمّم السيارات الطائرة — مستقبل وسائل النقل.",
+      "icon": "Car",
+      "color": "#0369A1",
+      "bgLight": "#F0F9FF",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "robotics",
+      "name": "Robotics",
+      "nameAr": "الروبوتات",
+      "description": "Build and program robots that move, sense, and respond to the real world.",
+      "descriptionAr": "ابنِ وبرمج روبوتات تتحرك وتستشعر وتتفاعل مع العالم الحقيقي.",
+      "icon": "Bot",
+      "color": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "flight-aviation",
+      "name": "Flight Aviation",
+      "nameAr": "الطيران",
+      "description": "Learn how aircraft fly — aerodynamics, forces, and build model planes.",
+      "descriptionAr": "تعلّم كيف تطير الطائرات — الديناميكيات والقوى وابنِ نماذج طائرات.",
+      "icon": "Plane",
+      "color": "#1D4ED8",
+      "bgLight": "#EFF6FF",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "multimedia",
+      "name": "Multimedia",
+      "nameAr": "الوسائط المتعددة",
+      "description": "Create videos, animations, and digital content using professional tools.",
+      "descriptionAr": "أنشئ مقاطع فيديو ورسومات متحركة ومحتوى رقمي باستخدام أدوات احترافية.",
+      "icon": "Video",
+      "color": "#9333EA",
+      "bgLight": "#FAF5FF",
+      "timeSlot": "slot-2",
+      "pricePerSession": 15.000
+    },
+    {
+      "id": "art-craft",
+      "name": "Art & Craft",
+      "nameAr": "الفن والحرف اليدوية",
+      "description": "Explore painting, sculpture, and mixed media in a vibrant creative studio.",
+      "descriptionAr": "استكشف الرسم والنحت والوسائط المختلطة في استوديو إبداعي متكامل.",
+      "icon": "Palette",
+      "color": "#F59E0B",
+      "bgLight": "#FFFBEB",
+      "timeSlot": "slot-1",
+      "pricePerSession": 15.000
+    }
+  ]
+}

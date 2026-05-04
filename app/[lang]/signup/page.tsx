@@ -105,7 +105,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? "Verification failed"); return }
       setStep("done")
-      setTimeout(() => router.push(`/${locale}/book/classroom`), 1500)
+      setTimeout(() => router.push(`/${locale}/book/child`), 1500)
     } catch {
       setError("Something went wrong. Please try again.")
     } finally {

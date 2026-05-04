@@ -86,7 +86,7 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? "Verification failed"); return }
       setStep("done")
-      setTimeout(() => router.push(`/${locale}/book/classroom`), 1200)
+      setTimeout(() => router.push(`/${locale}/book/child`), 1200)
     } catch {
       setError("Connection error. Please try again.")
     } finally {

@@ -6,6 +6,15 @@ export interface ChildDetails {
   gender: "male" | "female"
 }
 
+/** IDs of selected workshops (1 or 2 max) */
+export type SelectedWorkshopIds = [string] | [string, string]
+
+/** Selected session + resolved days */
+export interface SelectedSession {
+  sessionId: string
+  days: string[] // gender-filtered days for this session
+}
+
 export interface ParentDetails {
   name: string
   mobile: string
