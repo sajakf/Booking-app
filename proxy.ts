@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
+import { createServerClient } from "@supabase/ssr"
 import { isValidLocale } from "@/lib/i18n"
 
 export async function proxy(request: NextRequest) {
@@ -14,7 +15,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Admin route protection
+  // ── Admin routes — protected by NextAuth JWT ────────────────────────────
   const isAdminRoute = pathname.startsWith("/admin") || pathname.startsWith("/api/admin")
   const isLoginPage = pathname === "/admin/login"
 
@@ -33,17 +34,36 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Skip already-localized paths
-  if (pathname.startsWith("/en") || pathname.startsWith("/ar")) {
-    return NextResponse.next()
+  // ── Supabase Auth session refresh (parent-facing pages) ─────────────────
+  let response = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+  await supabase.auth.getUser()
+
+  // ── Locale redirect for root and unlocalized paths ──────────────────────
+  if (!pathname.startsWith("/en") && !pathname.startsWith("/ar")) {
+    const acceptLang = request.headers.get("accept-language") ?? ""
+    const preferred = acceptLang.split(",")[0]?.split("-")[0]?.toLowerCase()
+    const locale = isValidLocale(preferred ?? "") ? preferred : "en"
+    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url))
   }
 
-  // Locale redirect for root and unlocalized paths
-  const acceptLang = request.headers.get("accept-language") ?? ""
-  const preferred = acceptLang.split(",")[0]?.split("-")[0]?.toLowerCase()
-  const locale = isValidLocale(preferred ?? "") ? preferred : "en"
-
-  return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url))
+  return response
 }
 
 export const config = {
