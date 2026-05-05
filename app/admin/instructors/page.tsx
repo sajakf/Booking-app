@@ -35,8 +35,8 @@ export default async function InstructorsPage() {
             {inst.sessions.length > 0 && (
               <div className="mt-3 border-t pt-2 text-xs text-gray-500">
                 <p className="font-medium text-gray-700 mb-1">Assigned to:</p>
-                {inst.sessions.map((s) => (
-                  <p key={s.id}>{s.day.slice(0,3)} — {s.classroom.nameEn}</p>
+                {(inst.sessions as any[]).map((s) => (
+                  <p key={s.id}>{s.day.slice(0,3)} — {s.classroom?.nameEn}</p>
                 ))}
               </div>
             )}

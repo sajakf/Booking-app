@@ -47,10 +47,13 @@ export async function GET() {
     THURSDAY: 4, FRIDAY: 5, SATURDAY: 6,
   }
 
-  const classrooms: Classroom[] = dbClassrooms.map((room) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const classrooms: Classroom[] = (dbClassrooms as any[]).map((room) => {
     // Deduplicate instructors for this classroom
     const instructorMap = new Map<string, Instructor>()
-    for (const s of room.sessions) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const s of (room.sessions ?? []) as any[]) {
+      if (!s.instructor) continue
       instructorMap.set(s.instructor.id, {
         id: s.instructor.id,
         name: s.instructor.nameEn,
@@ -66,7 +69,8 @@ export async function GET() {
       const weekStart = new Date(week.startDate)
       const weekEnd = new Date(week.endDate)
 
-      return room.sessions.flatMap((session) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return ((room.sessions ?? []) as any[]).flatMap((session) => {
         const targetDow = dayIndexMap[session.day.toUpperCase()]
         if (targetDow === undefined) return []
 
@@ -115,8 +119,10 @@ export async function GET() {
 
   const instructors: Instructor[] = Array.from(
     new Map(
-      dbClassrooms.flatMap((r) =>
-        r.sessions.map((s) => [
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (dbClassrooms as any[]).flatMap((r) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((r.sessions ?? []) as any[]).filter((s) => s.instructor).map((s) => [
           s.instructor.id,
           {
             id: s.instructor.id,

@@ -34,8 +34,8 @@ export default async function ClassroomsPage() {
             {c.sessions.length > 0 && (
               <div className="mt-3 border-t pt-2 text-xs text-gray-500">
                 <p className="font-medium text-gray-700 mb-1">Schedule:</p>
-                {c.sessions.map((s) => (
-                  <p key={s.id}>{s.day.slice(0,3)} {s.startTime}–{s.endTime} · {s.instructor.nameEn}</p>
+                {(c.sessions as any[]).map((s) => (
+                  <p key={s.id}>{s.day.slice(0,3)} {s.startTime}–{s.endTime} · {s.instructor?.nameEn}</p>
                 ))}
               </div>
             )}
