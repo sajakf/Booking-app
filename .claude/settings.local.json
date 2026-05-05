@@ -31,7 +31,23 @@
       "Bash(git add *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/en)",
       "Bash(git config *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(git -C /Users/skf/Booking-App status --short)",
+      "Bash(git -C /Users/skf/Booking-App diff HEAD -- app/api/payment/initiate/route.ts types/booking.ts lib/myfatoorah/client.ts app/api/payment/callback/route.ts)",
+      "Bash(git -C /Users/skf/Booking-App log --oneline -3)",
+      "Bash(git -C /Users/skf/Booking-App show --stat fc4a909)",
+      "Bash(git -C /Users/skf/Booking-App show fc4a909 -- types/booking.ts)",
+      "Bash(git -C /Users/skf/Booking-App show fc4a909 -- lib/myfatoorah/client.ts)",
+      "Bash(git -C /Users/skf/Booking-App log --all --oneline)",
+      "Bash(git -C /Users/skf/Booking-App stash list)",
+      "Bash(git -C /Users/skf/Booking-App diff HEAD --name-only)",
+      "Bash(git -C /Users/skf/Booking-App show fc4a909 --name-only)",
+      "Bash(git -C /Users/skf/Booking-App show fc4a909:types/booking.ts)",
+      "Bash(git -C /Users/skf/Booking-App show fc4a909:lib/myfatoorah/client.ts)",
+      "Bash(git -C /Users/skf/Booking-App status -uall)",
+      "Bash(git -C /Users/skf/Booking-App log --all --oneline -- app/api/admin/bookings/\\\\\\\\[id\\\\\\\\]/refund/route.ts)",
+      "Bash(git -C /Users/skf/Booking-App log --all --oneline -- app/admin/waitlist/WaitlistActions.tsx)"
     ]
   }
 }
