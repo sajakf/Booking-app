@@ -6,6 +6,7 @@ export interface MyFatoorahLineItem {
 
 export interface MyFatoorahInitiateRequest {
   InvoiceValue: number
+  NotificationOption: "LNK" | "EML" | "SMS" | "ALL"
   DisplayCurrencyIso: "KWD"
   CustomerName: string
   CustomerEmail: string

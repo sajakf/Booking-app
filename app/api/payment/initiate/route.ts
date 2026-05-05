@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
 
   const request: MyFatoorahInitiateRequest = {
     InvoiceValue: bookingDraft.total,
+    NotificationOption: "LNK",
     DisplayCurrencyIso: "KWD",
     CustomerName: bookingDraft.parent?.name ?? "Customer",
     CustomerEmail: bookingDraft.parent?.email ?? "",
