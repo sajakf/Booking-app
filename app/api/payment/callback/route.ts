@@ -32,16 +32,18 @@ export async function GET(req: NextRequest) {
   const draft = JSON.parse(draftRecord.data) as Record<string, unknown>
 
   // In mock/test mode, skip real payment verification
+  let mfInvoiceId: string | null = null
   if (!isMock && process.env.MYFATOORAH_API_KEY && process.env.MYFATOORAH_API_KEY !== "test") {
     try {
       const { myfatoorah } = await import("@/lib/myfatoorah/client")
-      const status = await myfatoorah.getPaymentStatus<{ IsSuccess: boolean; Data: { InvoiceStatus: string } }>({
-        Key: paymentId,
-        KeyType: "PaymentId",
-      })
+      const status = await myfatoorah.getPaymentStatus<{
+        IsSuccess: boolean
+        Data: { InvoiceStatus: string; InvoiceId: number }
+      }>({ Key: paymentId, KeyType: "PaymentId" })
       if (!status.IsSuccess || status.Data.InvoiceStatus !== "Paid") {
         return NextResponse.redirect(new URL(`/${lang}/book/payment?error=payment_failed`, req.url))
       }
+      mfInvoiceId = String(status.Data.InvoiceId)
     } catch {
       return NextResponse.redirect(new URL(`/${lang}/book/payment?error=verification_failed`, req.url))
     }
@@ -70,7 +72,7 @@ export async function GET(req: NextRequest) {
         parentEmail: String(parent?.email ?? ""),
         parentPhone: String(parent?.mobile ?? ""),
         hasSibling: Boolean(bookingDraft.hasSibling),
-        promoCode: (bookingDraft.promo as Record<string, unknown> | undefined)?.code as string | undefined ?? null,
+        promoCode: (bookingDraft.promoCode as string | null) ?? null,
         medicalNotes: String(bookingDraft.medicalNotes ?? ""),
         subtotalKwd: Number(bookingDraft.subtotal ?? 0),
         discountKwd:
@@ -81,6 +83,7 @@ export async function GET(req: NextRequest) {
         paymentStatus: "SUCCESS",
         paymentMethod: String(bookingDraft.paymentMethod ?? ""),
         paymentId: paymentId || null,
+        invoiceId: mfInvoiceId,
         paidAt: now,
       },
     })
@@ -110,13 +113,13 @@ export async function GET(req: NextRequest) {
     isFullWeek: Boolean(bookingDraft.isFullWeek),
     subtotal: Number(bookingDraft.subtotal ?? 0),
     weekDiscount: Number(bookingDraft.weekDiscount ?? 0),
-    promoCode: (bookingDraft.promo as Record<string, unknown> | undefined)?.code as string | null ?? null,
+    promoCode: (bookingDraft.promoCode as string | null) ?? null,
     promoDiscount: Number(bookingDraft.promoDiscount ?? 0),
     siblingDiscount: Number(bookingDraft.siblingDiscount ?? 0),
     total: Number(bookingDraft.total ?? 0),
     currency: "KWD",
     paymentMethod: (bookingDraft.paymentMethod as Booking["paymentMethod"]) ?? null,
-    myFatoorahInvoiceId: dbBooking?.invoiceId ?? null,
+    myFatoorahInvoiceId: mfInvoiceId ?? dbBooking?.invoiceId ?? null,
     myFatoorahPaymentId: paymentId || null,
     createdAt: (bookingDraft.createdAt as string) ?? now.toISOString(),
     confirmedAt: now.toISOString(),

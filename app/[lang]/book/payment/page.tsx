@@ -44,24 +44,46 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
   const subtotal = Math.round(pricePerDay * days.length * 1000) / 1000
   const total = Math.max(0, Math.round((subtotal - state.promoDiscount - state.siblingDiscount) * 1000) / 1000)
 
-  const buildDraft = () => ({
-    locale,
-    child: state.child,
-    parent: state.parent,
-    medicalNotes: state.medicalNotes,
-    workshopIds: state.selectedWorkshopIds,
-    sessionId: state.selectedSessionId,
-    days,
-    subtotal,
-    promoCode: state.promoCode || null,
-    promoDiscount: state.promoDiscount,
-    siblingDiscount: state.siblingDiscount,
-    total,
-    currency: "KWD",
-    paymentMethod: selected,
-    status: "pending_payment",
-    createdAt: new Date().toISOString(),
-  })
+  const buildDraft = () => {
+    // Build one line item per workshop × per day so the DB has full detail
+    const lineItems = workshops.flatMap((w) =>
+      days.map((day) => ({
+        classroomId: w.id,
+        classroomName: w.name,           // EN name — used in MyFatoorah invoice & DB
+        classroomNameAr: w.nameAr,
+        date: day,
+        timeSlotId: w.timeSlot,
+        instructorId: "",
+        instructorName: "",
+        unitPrice: w.pricePerSession,
+      }))
+    )
+
+    return {
+      locale,
+      child: state.child,
+      parent: state.parent,
+      medicalNotes: state.medicalNotes,
+      // Resolved items — used by MyFatoorah invoice & stored in DB
+      lineItems,
+      // Raw IDs — kept for reference
+      workshopIds: state.selectedWorkshopIds,
+      sessionId: state.selectedSessionId,
+      days,
+      isFullWeek: days.length >= 5,
+      subtotal,
+      promoCode: state.promoCode || null,   // string, not nested object
+      promoDiscount: state.promoDiscount,
+      hasSibling: state.hasSibling,
+      siblingDiscount: state.siblingDiscount,
+      weekDiscount: 0,
+      total,
+      currency: "KWD",
+      paymentMethod: selected,
+      status: "pending_payment",
+      createdAt: new Date().toISOString(),
+    }
+  }
 
   const handlePay = async () => {
     dispatch({ type: "SET_PAYMENT_METHOD", method: selected })
