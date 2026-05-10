@@ -2,21 +2,15 @@
 
 import { use, useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { isValidLocale, t } from "@/lib/i18n"
+import Link from "next/link"
+import { isValidLocale } from "@/lib/i18n"
+import { LanguageToggle } from "@/components/layout/LanguageToggle"
 import type { Locale } from "@/types/i18n"
-import { ArrowRight, ArrowLeft, CheckCircle, Phone, User, RefreshCw } from "lucide-react"
+import {
+  ArrowRight, ArrowLeft, CheckCircle, Phone, User,
+  RefreshCw, Telescope, AlertCircle, Loader2, Sparkles,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
-
-function CampLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden>
-      <circle cx="24" cy="24" r="22" fill="#1D4ED8" />
-      <path d="M24 8 L27.5 18H38L29.5 24.5L33 35L24 28.5L15 35L18.5 24.5L10 18H20.5L24 8Z" fill="#FCD34D" />
-      <circle cx="24" cy="24" r="6" fill="#1D4ED8" />
-      <circle cx="24" cy="24" r="3" fill="#FCD34D" />
-    </svg>
-  )
-}
 
 export default function SignupPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params)
@@ -25,37 +19,37 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
   const router = useRouter()
   const ArrowNext = isAr ? ArrowLeft : ArrowRight
 
-  // ── Step 1: details ──────────────────────────────────────────────────────
+  // ── State ─────────────────────────────────────────────────────────────────
   const [name, setName]   = useState("")
   const [phone, setPhone] = useState("")
-
-  // ── Step 2: OTP ──────────────────────────────────────────────────────────
-  const [step, setStep]         = useState<"form" | "otp" | "done">("form")
-  const [otp, setOtp]           = useState(["", "", "", "", "", ""])
-  const otpRefs                 = useRef<(HTMLInputElement | null)[]>([])
-  const [devCode, setDevCode]   = useState<string | null>(null)
+  const [step, setStep]   = useState<"form" | "otp" | "done">("form")
+  const [otp, setOtp]     = useState(["", "", "", "", "", ""])
+  const otpRefs           = useRef<(HTMLInputElement | null)[]>([])
+  const [devCode, setDevCode]               = useState<string | null>(null)
   const [resendCountdown, setResendCountdown] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState("")
 
-  // ── Shared ───────────────────────────────────────────────────────────────
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState("")
-
-  // Countdown timer for resend
   useEffect(() => {
     if (resendCountdown <= 0) return
     const id = setTimeout(() => setResendCountdown((v) => v - 1), 1000)
     return () => clearTimeout(id)
   }, [resendCountdown])
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
-  const phoneDigits = phone.replace(/\D/g, "")
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  const phoneDigits  = phone.replace(/\D/g, "")
   const isValidPhone = /^[569]\d{7}$/.test(phoneDigits)
 
   const handleSendOTP = async () => {
     setError("")
-    if (!name.trim()) { setError(isAr ? "الرجاء إدخال الاسم" : "Please enter your name"); return }
-    if (!isValidPhone) { setError(isAr ? "أدخل رقم كويتي صحيح (يبدأ بـ 5 أو 6 أو 9)" : "Enter a valid Kuwait number (starts with 5, 6, or 9)"); return }
-
+    if (!name.trim()) {
+      setError(isAr ? "الرجاء إدخال الاسم" : "Please enter your name")
+      return
+    }
+    if (!isValidPhone) {
+      setError(isAr ? "أدخل رقماً كويتياً صحيحاً (يبدأ بـ 5 أو 6 أو 9)" : "Enter a valid Kuwait number (starts with 5, 6, or 9)")
+      return
+    }
     setLoading(true)
     try {
       const res = await fetch("/api/auth/otp", {
@@ -68,7 +62,6 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
       setDevCode(data.devCode ?? null)
       setStep("otp")
       setResendCountdown(60)
-      // Focus first OTP box after render
       setTimeout(() => otpRefs.current[0]?.focus(), 100)
     } catch {
       setError("Something went wrong. Please try again.")
@@ -79,23 +72,18 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
 
   const handleOtpChange = (index: number, value: string) => {
     const digit = value.replace(/\D/g, "").slice(-1)
-    const next = [...otp]
-    next[index] = digit
-    setOtp(next)
+    const next = [...otp]; next[index] = digit; setOtp(next)
     if (digit && index < 5) otpRefs.current[index + 1]?.focus()
   }
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus()
-    }
+    if (e.key === "Backspace" && !otp[index] && index > 0) otpRefs.current[index - 1]?.focus()
   }
 
   const handleVerify = async () => {
     const code = otp.join("")
     if (code.length < 6) { setError(isAr ? "أدخل الرمز المكون من 6 أرقام" : "Enter the 6-digit code"); return }
-    setError("")
-    setLoading(true)
+    setError(""); setLoading(true)
     try {
       const res = await fetch("/api/auth/otp", {
         method: "POST",
@@ -115,190 +103,198 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
 
   const handleResend = async () => {
     if (resendCountdown > 0) return
-    setOtp(["", "", "", "", "", ""])
-    setError("")
-    setDevCode(null)
+    setOtp(["", "", "", "", "", ""]); setError(""); setDevCode(null)
     await handleSendOTP()
   }
 
-  const inputBase = "w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+  // ── Shared input style (matches booking flow) ─────────────────────────────
+  const inputCls = (hasError?: boolean) => cn(
+    "w-full rounded-2xl border-2 bg-white/10 px-4 py-3.5 text-white placeholder:text-white/30 outline-none transition",
+    "focus:border-yellow-400 focus:bg-white/15",
+    hasError ? "border-red-400" : "border-white/20"
+  )
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white" dir={isAr ? "rtl" : "ltr"}>
+    <div className="flex min-h-screen flex-col bg-[#0a1628]" dir={isAr ? "rtl" : "ltr"}>
 
-      {/* ── Left decorative panel ── */}
-      <div className="relative hidden overflow-hidden lg:flex lg:w-5/12 bg-gradient-to-br from-indigo-700 via-blue-700 to-blue-600">
-        <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-white/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 size-80 rounded-full bg-yellow-300/10 blur-3xl" />
-        <div className="relative z-10 flex flex-col items-center justify-center gap-5 p-12 text-white">
-          <CampLogo className="size-20" />
-          <h2 className="text-center text-3xl font-black">
-            {isAr ? "انضم إلى عائلتنا" : "Join Our Family"}
-          </h2>
-          <p className="text-center text-blue-200 leading-relaxed">
-            {isAr
-              ? "سجّل أو سجّل دخولك برقم هاتفك فقط — لا كلمة مرور"
-              : "Register or sign in with just your phone number — no password"}
-          </p>
-          <ul className="mt-4 space-y-3 self-start">
-            {(isAr
-              ? ["تتبع جميع حجوزاتك", "إشعارات فورية على واتساب", "حجز أسرع في المرة القادمة", "إدارة أطفال متعددين"]
-              : ["Track all your bookings", "Instant WhatsApp alerts", "Faster checkout next time", "Manage multiple children"]
-            ).map((item) => (
-              <li key={item} className="flex items-center gap-2.5 text-sm text-blue-100">
-                <CheckCircle className="size-4 shrink-0 text-yellow-300" />
-                {item}
-              </li>
-            ))}
-          </ul>
+      {/* ── Header — identical to BookingShell ── */}
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0d1f3c]/95 shadow-lg backdrop-blur">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
+          <Link href={`/${locale}`} className="flex items-center gap-2 text-white transition hover:opacity-80">
+            <Telescope className="size-5 text-yellow-400" />
+            <span className="hidden text-sm font-bold text-yellow-400 sm:inline">Science Club</span>
+          </Link>
+          <LanguageToggle />
         </div>
-      </div>
+      </header>
 
-      {/* ── Right: form panel ── */}
-      <div className="flex flex-1 items-center justify-center px-6 py-10">
-        <div className="w-full max-w-sm">
+      {/* ── Main ── */}
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-10">
 
-          {/* Logo (mobile only) */}
-          <div className="mb-8 flex flex-col items-center lg:hidden">
-            <CampLogo className="mb-2 size-12" />
-            <span className="text-sm font-bold text-gray-700">
-              {isAr ? "مخيم النجوم الصغيرة" : "Little Stars Camp"}
-            </span>
+        {/* ── SUCCESS ── */}
+        {step === "done" && (
+          <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-10 text-center">
+            <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-emerald-400/20 ring-4 ring-emerald-400/30">
+              <CheckCircle className="size-10 text-emerald-400" />
+            </div>
+            <p className="text-2xl font-extrabold text-white">
+              {isAr ? "تم التسجيل بنجاح! 🎉" : "You're in! 🎉"}
+            </p>
+            <p className="mt-2 text-sm text-emerald-300">
+              {isAr ? "جاري تحويلك…" : "Redirecting you now…"}
+            </p>
           </div>
+        )}
 
-          {/* ── SUCCESS ── */}
-          {step === "done" && (
-            <div className="flex flex-col items-center gap-4 rounded-2xl bg-emerald-50 border border-emerald-100 p-8 text-center">
-              <CheckCircle className="size-14 text-emerald-500" />
-              <p className="text-xl font-black text-emerald-800">
-                {isAr ? "تم التسجيل بنجاح! 🎉" : "Account created! 🎉"}
-              </p>
-              <p className="text-sm text-emerald-600">
-                {isAr ? "جاري تحويلك..." : "Redirecting you now..."}
+        {/* ── STEP 1: Name + Phone ── */}
+        {step === "form" && (
+          <>
+            <div className="mb-8 text-center">
+              <div className="mb-4 flex justify-center">
+                <div className="flex size-16 items-center justify-center rounded-full bg-yellow-400/20 ring-2 ring-yellow-400/40">
+                  <Sparkles className="size-8 text-yellow-400" />
+                </div>
+              </div>
+              <h1 className="text-3xl font-extrabold text-white">
+                {isAr ? "إنشاء حساب" : "Create Account"}
+              </h1>
+              <p className="mt-2 text-blue-200">
+                {isAr ? "أدخل اسمك ورقم هاتفك للمتابعة" : "Enter your name & phone number to continue"}
               </p>
             </div>
-          )}
 
-          {/* ── STEP 1: Name + Phone ── */}
-          {step === "form" && (
-            <>
-              <div className="mb-8">
-                <h1 className="text-3xl font-black text-gray-900">
-                  {isAr ? "إنشاء حساب" : "Create Account"}
-                </h1>
-                <p className="mt-1 text-gray-500 text-sm">
-                  {isAr ? "أدخل اسمك ورقم هاتفك للمتابعة" : "Enter your name and phone number to continue"}
-                </p>
-              </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+              <div className="space-y-5">
 
-              <div className="space-y-4">
                 {/* Full Name */}
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-blue-200">
                     {isAr ? "الاسم الكامل" : "Full Name"}
                   </label>
                   <div className="relative">
-                    <User className={cn("absolute top-3.5 size-4 text-gray-400", isAr ? "right-3" : "left-3")} />
+                    <User className={cn("absolute top-1/2 -translate-y-1/2 size-4 text-white/30", isAr ? "right-4" : "left-4")} />
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSendOTP()}
-                      required
                       dir="auto"
                       autoComplete="off"
                       placeholder={isAr ? "الاسم الكامل" : "Your full name"}
-                      className={cn(inputBase, isAr ? "pr-9" : "pl-9")}
+                      className={cn(inputCls(), isAr ? "pr-11" : "pl-11")}
                     />
                   </div>
                 </div>
 
-                {/* Phone */}
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                {/* Mobile */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-blue-200">
                     {isAr ? "رقم الجوال" : "Mobile Number"}
                   </label>
-                  <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20">
-                    <span className="flex items-center gap-1.5 border-e border-gray-200 bg-gray-100 px-3 text-sm font-semibold text-gray-600 shrink-0">
+                  <div className={cn(
+                    "flex overflow-hidden rounded-2xl border-2 bg-white/10 transition",
+                    "focus-within:border-yellow-400 focus-within:bg-white/15 border-white/20"
+                  )}>
+                    <span className="flex shrink-0 items-center gap-1.5 border-e border-white/20 bg-white/10 px-4 text-sm font-bold text-white/70">
                       🇰🇼 +965
                     </span>
                     <div className="relative flex flex-1 items-center">
-                      <Phone className={cn("absolute size-4 text-gray-400", isAr ? "right-3" : "left-3")} />
+                      <Phone className={cn("absolute size-4 text-white/30", isAr ? "right-4" : "left-4")} />
                       <input
                         type="tel"
                         inputMode="numeric"
-                        value={phone}
+                        value={phoneDigits}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 8))}
                         onKeyDown={(e) => e.key === "Enter" && handleSendOTP()}
                         dir="ltr"
                         autoComplete="off"
                         placeholder="5X XXX XXXX"
-                        className={cn("flex-1 bg-transparent py-3.5 text-sm text-gray-900 outline-none placeholder:text-gray-400", isAr ? "pr-9 pl-3" : "pl-9 pr-3")}
+                        className={cn(
+                          "flex-1 bg-transparent py-3.5 text-white outline-none placeholder:text-white/30",
+                          isAr ? "pr-11 pl-3" : "pl-11 pr-3"
+                        )}
                       />
                     </div>
                   </div>
-                  <p className="mt-1.5 text-xs text-gray-400">
+                  <p className="text-xs text-white/40">
                     {isAr ? "أرقام الجوال الكويتية فقط (تبدأ بـ 5 أو 6 أو 9)" : "Kuwait mobile only (starts with 5, 6, or 9)"}
                   </p>
                 </div>
 
                 {error && (
-                  <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
+                  <div className="flex items-center gap-2 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-300">
+                    <AlertCircle className="size-4 shrink-0" />
+                    {error}
+                  </div>
                 )}
 
                 <button
                   onClick={handleSendOTP}
                   disabled={loading || !name.trim() || phoneDigits.length < 8}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-4 text-base font-bold text-white shadow-lg shadow-blue-700/30 transition hover:bg-blue-800 active:scale-[0.98] disabled:opacity-60"
+                  className={cn(
+                    "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition-all",
+                    !loading && name.trim() && phoneDigits.length >= 8
+                      ? "bg-yellow-400 text-[#0a1628] shadow-lg shadow-yellow-400/30 hover:bg-yellow-300 active:scale-[0.98]"
+                      : "cursor-not-allowed bg-white/10 text-white/40"
+                  )}
                 >
                   {loading
-                    ? <span className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    : <>{isAr ? "إرسال رمز التحقق" : "Send OTP"} <ArrowNext className="size-5" /></>}
+                    ? <Loader2 className="size-5 animate-spin" />
+                    : <><Sparkles className="size-5" /> {isAr ? "إرسال رمز التحقق" : "Send OTP"} <ArrowNext className="size-5" /></>}
                 </button>
               </div>
+            </div>
 
-              <p className="mt-6 text-center text-sm text-gray-400">
+            <p className="mt-6 text-center text-sm text-white/40">
+              {isAr
+                ? "إذا كان لديك حساب، أدخل رقمك وسيتم تسجيل دخولك تلقائياً"
+                : "Already registered? Enter your number — you'll be signed in automatically"}
+            </p>
+          </>
+        )}
+
+        {/* ── STEP 2: OTP Entry ── */}
+        {step === "otp" && (
+          <>
+            <div className="mb-8 text-center">
+              <button
+                onClick={() => { setStep("form"); setError(""); setOtp(["","","","","",""]) }}
+                className="mb-5 flex items-center gap-1.5 text-sm font-medium text-white/50 transition hover:text-white mx-auto"
+              >
+                <ArrowLeft className="size-4" />
+                {isAr ? "تغيير الرقم" : "Change number"}
+              </button>
+              <div className="mb-4 flex justify-center">
+                <div className="flex size-16 items-center justify-center rounded-full bg-blue-400/20 ring-2 ring-blue-400/40">
+                  <Phone className="size-8 text-blue-300" />
+                </div>
+              </div>
+              <h1 className="text-3xl font-extrabold text-white">
+                {isAr ? "أدخل رمز التحقق" : "Enter OTP"}
+              </h1>
+              <p className="mt-2 text-sm text-blue-200">
                 {isAr
-                  ? "إذا كان لديك حساب، أدخل رقمك وسيتم تسجيل دخولك تلقائياً"
-                  : "Already registered? Enter your number — you'll be signed in automatically"}
+                  ? <span>أُرسل رمز مكوّن من 6 أرقام إلى <span className="font-bold text-white" dir="ltr">+965 {phoneDigits}</span></span>
+                  : <span>We sent a 6-digit code to <span className="font-bold text-white">+965 {phoneDigits}</span></span>
+                }
               </p>
-            </>
-          )}
+            </div>
 
-          {/* ── STEP 2: OTP Entry ── */}
-          {step === "otp" && (
-            <>
-              <div className="mb-8">
-                <button
-                  onClick={() => { setStep("form"); setError(""); setOtp(["","","","","",""]) }}
-                  className="mb-4 flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-800"
-                >
-                  <ArrowLeft className="size-4" />
-                  {isAr ? "تغيير الرقم" : "Change number"}
-                </button>
-                <h1 className="text-3xl font-black text-gray-900">
-                  {isAr ? "أدخل رمز التحقق" : "Enter OTP"}
-                </h1>
-                <p className="mt-1 text-sm text-gray-500">
-                  {isAr
-                    ? <>أُرسل رمز مكوّن من 6 أرقام إلى <span className="font-semibold text-gray-800 dir-ltr">+965 {phoneDigits}</span></>
-                    : <>We sent a 6-digit code to <span className="font-semibold text-gray-800">+965 {phoneDigits}</span></>}
-                </p>
-              </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur space-y-5">
 
               {/* Dev mode helper */}
               {devCode && (
-                <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                  <span className="text-lg">🔧</span>
+                <div className="flex items-center gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3">
+                  <span className="text-xl">🔧</span>
                   <div>
-                    <p className="text-xs font-semibold text-amber-800">Dev mode — OTP code:</p>
-                    <p className="text-2xl font-black tracking-widest text-amber-900">{devCode}</p>
+                    <p className="text-xs font-semibold text-amber-300">Dev mode — OTP code:</p>
+                    <p className="text-2xl font-extrabold tracking-widest text-yellow-400">{devCode}</p>
                   </div>
                 </div>
               )}
 
               {/* 6-digit OTP boxes */}
-              <div className={cn("mb-6 flex gap-2 justify-center", isAr && "flex-row-reverse")}>
+              <div className={cn("flex gap-2 justify-center", isAr && "flex-row-reverse")}>
                 {otp.map((digit, i) => (
                   <input
                     key={i}
@@ -310,44 +306,62 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onFocus={(e) => e.target.select()}
-                    className="size-12 rounded-xl border-2 border-gray-200 bg-gray-50 text-center text-xl font-bold text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+                    className={cn(
+                      "size-12 rounded-2xl border-2 bg-white/10 text-center text-xl font-extrabold text-white outline-none transition",
+                      digit ? "border-yellow-400 bg-yellow-400/10" : "border-white/20",
+                      "focus:border-yellow-400 focus:bg-white/15"
+                    )}
                   />
                 ))}
               </div>
 
               {error && (
-                <p className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
+                <div className="flex items-center gap-2 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-300">
+                  <AlertCircle className="size-4 shrink-0" />
+                  {error}
+                </div>
               )}
 
               <button
                 onClick={handleVerify}
                 disabled={loading || otp.join("").length < 6}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 py-4 text-base font-bold text-white shadow-lg shadow-blue-700/30 transition hover:bg-blue-800 active:scale-[0.98] disabled:opacity-60"
+                className={cn(
+                  "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition-all",
+                  !loading && otp.join("").length >= 6
+                    ? "bg-yellow-400 text-[#0a1628] shadow-lg shadow-yellow-400/30 hover:bg-yellow-300 active:scale-[0.98]"
+                    : "cursor-not-allowed bg-white/10 text-white/40"
+                )}
               >
                 {loading
-                  ? <span className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  : <>{isAr ? "تحقق وإنشاء الحساب" : "Verify & Create Account"} <CheckCircle className="size-5" /></>}
+                  ? <Loader2 className="size-5 animate-spin" />
+                  : <><CheckCircle className="size-5" /> {isAr ? "تحقق وإنشاء الحساب" : "Verify & Create Account"}</>
+                }
               </button>
 
               {/* Resend */}
-              <div className="mt-5 text-center">
+              <div className="text-center">
                 {resendCountdown > 0 ? (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-white/40">
                     {isAr ? `إعادة الإرسال بعد ${resendCountdown}ث` : `Resend in ${resendCountdown}s`}
                   </p>
                 ) : (
                   <button
                     onClick={handleResend}
-                    className="flex items-center gap-1.5 mx-auto text-sm font-semibold text-blue-600 hover:underline"
+                    className="mx-auto flex items-center gap-1.5 text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition"
                   >
                     <RefreshCw className="size-3.5" />
                     {isAr ? "إعادة إرسال الرمز" : "Resend code"}
                   </button>
                 )}
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
+      </main>
+
+      {/* ── Footer — identical to BookingShell ── */}
+      <div className="flex h-16 select-none items-center justify-center text-xl tracking-widest text-white/20 pointer-events-none">
+        ✦ ✦ ✦ ✦ ✦
       </div>
     </div>
   )
