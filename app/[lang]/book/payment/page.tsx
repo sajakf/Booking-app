@@ -1,6 +1,7 @@
 "use client"
 
 import { use, useState } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useBooking } from "@/context/BookingContext"
 import { useLocale } from "@/hooks/useLocale"
@@ -86,6 +87,17 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
   }
 
   const handlePay = async () => {
+    // Guard: email is required by MyFatoorah
+    const email = state.parent?.email?.trim() ?? ""
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError(
+        isAr
+          ? "البريد الإلكتروني مطلوب للدفع. يرجى العودة وإدخاله."
+          : "Email is required to proceed with payment. Please go back and enter it."
+      )
+      return
+    }
+
     dispatch({ type: "SET_PAYMENT_METHOD", method: selected })
     setLoading(true)
     setError("")
@@ -260,7 +272,17 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
         ))}
       </div>
 
-      {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+      {error && (
+        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-300 space-y-2">
+          <p>{error}</p>
+          <Link
+            href={`/${locale}/book/details`}
+            className="inline-flex items-center gap-1 font-semibold text-yellow-300 underline underline-offset-2 hover:text-yellow-200"
+          >
+            {isAr ? "← العودة لإدخال البريد الإلكتروني" : "Go back and add email →"}
+          </Link>
+        </div>
+      )}
 
       {/* CTA */}
       <button

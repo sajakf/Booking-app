@@ -46,7 +46,9 @@ export default function DetailsPage({ params }: { params: Promise<{ lang: string
     if (!KUWAIT_MOBILE_RE.test(mobileDigits)) {
       e.parentMobile = t("error.phone")
     }
-    if (parentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail)) {
+    if (!parentEmail.trim()) {
+      e.parentEmail = isAr ? "البريد الإلكتروني مطلوب" : "Email is required"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parentEmail.trim())) {
       e.parentEmail = t("error.email")
     }
     return e
@@ -139,6 +141,7 @@ export default function DetailsPage({ params }: { params: Promise<{ lang: string
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-blue-200">
               {t("step4.parent.email")}
+              <span className="ml-1 text-red-400">*</span>
             </label>
             <input
               type="email"
