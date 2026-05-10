@@ -137,7 +137,7 @@ export default function DetailsPage({ params }: { params: Promise<{ lang: string
             {errors.parentMobile && <Err msg={errors.parentMobile} />}
           </div>
 
-          {/* Email (optional) */}
+          {/* Email (mandatory) */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-blue-200">
               {t("step4.parent.email")}

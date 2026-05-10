@@ -95,7 +95,7 @@ export const en = {
   "step4.parent.heading": "Parent / Guardian",
   "step4.parent.name": "Your full name",
   "step4.parent.mobile": "Mobile number",
-  "step4.parent.email": "Email address (optional)",
+  "step4.parent.email": "Email address",
   "step4.medical.heading": "Medical / Special Notes",
   "step4.medical.placeholder": "Any allergies, special needs or notes for the instructor (optional)",
   "step4.continue": "Review My Booking →",

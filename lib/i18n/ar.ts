@@ -95,7 +95,7 @@ export const ar = {
   "step4.parent.heading": "ولي الأمر",
   "step4.parent.name": "اسمك الكامل",
   "step4.parent.mobile": "رقم الجوال",
-  "step4.parent.email": "البريد الإلكتروني (اختياري)",
+  "step4.parent.email": "البريد الإلكتروني",
   "step4.medical.heading": "ملاحظات طبية أو خاصة",
   "step4.medical.placeholder": "الحساسية أو الاحتياجات الخاصة أو أي ملاحظات للمدرب (اختياري)",
   "step4.continue": "راجع حجزي ←",
