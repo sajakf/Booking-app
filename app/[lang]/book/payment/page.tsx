@@ -24,8 +24,12 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
   const [selected, setSelected] = useState<PaymentMethod>("KNET")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [verifying, setVerifying] = useState(false)
+  const [verifyResult, setVerifyResult] = useState<{ reason?: string; status?: string } | null>(null)
 
   const urlError = searchParams.get("error")
+  const urlPaymentId = searchParams.get("paymentId")
+  const urlDraftId = searchParams.get("draftId")
 
   // Guard
   if (!state.child || !state.parent || state.selectedWorkshopIds.length === 0 || !state.selectedSessionId) {
@@ -112,6 +116,61 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
       {urlError === "seat_expired" && (
         <div className="mb-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-300">
           ⏱ {isAr ? "انتهت مدة حجز مقعدك. حاول مرة أخرى." : "Your seat hold expired. Please try again — seats are still available."}
+        </div>
+      )}
+
+      {/* Payment failed error + recovery */}
+      {urlError === "failed" && (
+        <div className="mb-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm space-y-3">
+          <p className="font-semibold text-red-300">
+            ❌ {isAr ? "فشلت عملية الدفع." : "Payment was not completed."}
+          </p>
+
+          {/* KNET-specific hint */}
+          {selected === "KNET" && !verifyResult && (
+            <p className="text-red-200/80 text-xs leading-relaxed">
+              {isAr
+                ? "للدفع بـ KNET: أدخل رقم البطاقة ← PIN ← رمز OTP بالترتيب لإتمام العملية."
+                : "For KNET: you must complete all 3 steps — card number → PIN → OTP — to capture the payment."}
+            </p>
+          )}
+
+          {/* Verify result message */}
+          {verifyResult && (
+            <p className="text-amber-200 text-xs">{verifyResult.reason}</p>
+          )}
+
+          {/* Verify button — only when we have a paymentId */}
+          {urlPaymentId && !verifyResult && (
+            <button
+              onClick={async () => {
+                setVerifying(true)
+                try {
+                  const params = new URLSearchParams({ paymentId: urlPaymentId, lang: locale })
+                  if (urlDraftId) params.set("draftId", urlDraftId)
+                  const res = await fetch(`/api/payment/verify?${params}`)
+                  // If verify redirects (payment recovered), the fetch follows it
+                  if (res.redirected && res.url.includes("/confirmation")) {
+                    window.location.href = res.url
+                    return
+                  }
+                  const data = await res.json()
+                  setVerifyResult(data)
+                } catch {
+                  setVerifyResult({ reason: "Could not verify payment status. Please try again." })
+                } finally {
+                  setVerifying(false)
+                }
+              }}
+              disabled={verifying}
+              className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/15 disabled:opacity-50"
+            >
+              {verifying ? <Loader2 className="size-3.5 animate-spin" /> : "🔍"}
+              {verifying
+                ? (isAr ? "جاري التحقق…" : "Checking…")
+                : (isAr ? "التحقق من حالة الدفع" : "Check payment status")}
+            </button>
+          )}
         </div>
       )}
 

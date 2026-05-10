@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
   const callbackUrl = `${baseUrl}/api/payment/callback?draftId=${draftId}&lang=${locale}`
-  const errorUrl = `${baseUrl}/${locale}/book/payment?error=failed`
+  const errorUrl = `${baseUrl}/${locale}/book/payment?error=failed&draftId=${draftId}`
 
   const items = bookingDraft.lineItems?.map((item: { classroomName: string; unitPrice: number }) => ({
     ItemName: item.classroomName,
