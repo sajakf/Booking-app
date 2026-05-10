@@ -79,19 +79,24 @@ Deno.serve(async (req: Request) => {
     ? lineItems.map(item => ({ ItemName: item.classroomName, Quantity: 1, UnitPrice: item.unitPrice }))
     : [{ ItemName: 'Camp Booking', Quantity: 1, UnitPrice: Number(bookingDraft.total) }]
 
+  const customerEmail = String(parent?.email ?? '').trim()
+  const customerMobile = String(parent?.mobile ?? '').replace('+965', '').trim()
+
   const mfPayload: Record<string, unknown> = {
     InvoiceValue: Number(bookingDraft.total),
     NotificationOption: 'LNK',
     DisplayCurrencyIso: 'KWD',
     CustomerName: String(parent?.name ?? 'Customer'),
-    CustomerEmail: String(parent?.email ?? ''),
-    CustomerMobile: String(parent?.mobile ?? '').replace('+965', ''),
     CallBackUrl: callbackUrl,
     ErrorUrl: errorUrl,
     Language: locale === 'ar' ? 'AR' : 'EN',
     UserDefinedField: draftId,
     InvoiceItems: invoiceItems,
   }
+
+  // Only include email/mobile when non-empty — MyFatoorah rejects empty strings
+  if (customerEmail) mfPayload.CustomerEmail = customerEmail
+  if (customerMobile) mfPayload.CustomerMobile = customerMobile
 
   if (paymentMethod && PAYMENT_METHOD_IDS[paymentMethod]) {
     mfPayload.PaymentMethodId = PAYMENT_METHOD_IDS[paymentMethod]
