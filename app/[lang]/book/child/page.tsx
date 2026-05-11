@@ -123,15 +123,15 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
                   key={g}
                   onClick={() => { setGender(g); setErrors((prev) => ({ ...prev, gender: undefined })) }}
                   className={cn(
-                    "relative flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all font-bold text-base",
+                    "relative flex flex-col items-center gap-2 rounded-2xl border-2 py-4 pt-4 pb-3 transition-all font-bold text-base",
                     isSelected
                       ? "border-[#32246b] bg-[#32246b]/8 text-[#32246b] scale-[1.02] shadow-lg shadow-[#32246b]/10"
                       : "border-[#5356df]/20 bg-white text-[#32246b]/60 hover:border-[#5356df]/40 hover:bg-[#f8f6ff]"
                   )}
                 >
                   {g === "male"
-                    ? <ScientistBoy className="size-20" />
-                    : <ScientistGirl className="size-20" />
+                    ? <ScientistBoy className="h-32 w-auto object-contain drop-shadow-sm" />
+                    : <ScientistGirl className="h-32 w-auto object-contain drop-shadow-sm" />
                   }
                   <span className={cn("text-sm font-bold", isSelected ? "text-[#32246b]" : "text-[#32246b]/60")}>
                     {g === "male" ? (isAr ? "ولد" : "Boy") : (isAr ? "بنت" : "Girl")}

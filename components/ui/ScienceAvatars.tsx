@@ -1,7 +1,24 @@
 "use client"
 
-// ── ScientistBoy ──────────────────────────────────────────────────────────────
+import Image from "next/image"
+
+// ── ScientistBoy — real PNG avatar ────────────────────────────────────────────
 export function ScientistBoy({ className }: { className?: string }) {
+  return (
+    <Image
+      src="/avatars/scientist-boy.png"
+      alt="Scientist Boy"
+      width={160}
+      height={200}
+      className={className}
+      style={{ objectFit: "contain" }}
+      priority
+    />
+  )
+}
+
+// ── ScientistBoy SVG fallback (kept for internal use) ─────────────────────────
+function ScientistBoySVG({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 80 100" fill="none" className={className} aria-hidden>
       {/* Body - lab coat */}
@@ -55,8 +72,23 @@ export function ScientistBoy({ className }: { className?: string }) {
   )
 }
 
-// ── ScientistGirl ─────────────────────────────────────────────────────────────
+// ── ScientistGirl — real PNG avatar ──────────────────────────────────────────
 export function ScientistGirl({ className }: { className?: string }) {
+  return (
+    <Image
+      src="/avatars/scientist-girl.png"
+      alt="Scientist Girl"
+      width={160}
+      height={200}
+      className={className}
+      style={{ objectFit: "contain" }}
+      priority
+    />
+  )
+}
+
+// ── ScientistGirl SVG fallback (kept for internal use) ────────────────────────
+function ScientistGirlSVG({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 80 100" fill="none" className={className} aria-hidden>
       {/* Body - lab coat */}
