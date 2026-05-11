@@ -3,7 +3,7 @@
 import Image from "next/image"
 
 // ── ScientistBoy — real PNG avatar ────────────────────────────────────────────
-export function ScientistBoy({ className }: { className?: string }) {
+export function ScientistBoy({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <Image
       src="/avatars/scientist-boy.png"
@@ -11,7 +11,7 @@ export function ScientistBoy({ className }: { className?: string }) {
       width={160}
       height={200}
       className={className}
-      style={{ objectFit: "contain" }}
+      style={{ objectFit: "contain", ...style }}
       priority
     />
   )
@@ -73,7 +73,7 @@ function ScientistBoySVG({ className }: { className?: string }) {
 }
 
 // ── ScientistGirl — real PNG avatar ──────────────────────────────────────────
-export function ScientistGirl({ className }: { className?: string }) {
+export function ScientistGirl({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <Image
       src="/avatars/scientist-girl.png"
@@ -81,7 +81,7 @@ export function ScientistGirl({ className }: { className?: string }) {
       width={160}
       height={200}
       className={className}
-      style={{ objectFit: "contain" }}
+      style={{ objectFit: "contain", ...style }}
       priority
     />
   )

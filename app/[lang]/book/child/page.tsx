@@ -130,8 +130,8 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
                   )}
                 >
                   {g === "male"
-                    ? <ScientistBoy className="h-32 w-auto object-contain drop-shadow-sm" />
-                    : <ScientistGirl className="h-32 w-auto object-contain drop-shadow-sm" />
+                    ? <ScientistBoy className="h-32 w-auto object-contain" style={{ mixBlendMode: "multiply" }} />
+                    : <ScientistGirl className="h-32 w-auto object-contain" style={{ mixBlendMode: "multiply" }} />
                   }
                   <span className={cn("text-sm font-bold", isSelected ? "text-[#32246b]" : "text-[#32246b]/60")}>
                     {g === "male" ? (isAr ? "ولد" : "Boy") : (isAr ? "بنت" : "Girl")}
