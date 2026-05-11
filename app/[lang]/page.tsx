@@ -230,29 +230,6 @@ export default function LandingPage({ params }: { params: Promise<{ lang: string
         </div>
       </section>
 
-      {/* ── CAMP VIDEO PREVIEW ───────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 pt-14 pb-2">
-        <div className="overflow-hidden rounded-3xl shadow-xl border border-[#5356df]/15 relative">
-          <video
-            src="/videos/science-day.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full object-cover max-h-72"
-          />
-          <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10" />
-          <div className="absolute bottom-0 inset-x-0 flex items-end justify-between px-5 py-4 bg-gradient-to-t from-[#32246b]/70 to-transparent">
-            <p className="font-display text-xl text-white leading-none">
-              {isAr ? "نادي العلوم الصيفي 2026" : "Summer Science Club 2026"}
-            </p>
-            <span className="rounded-full bg-[#b3f82d] px-3 py-1 text-xs font-bold text-[#32246b]">
-              {isAr ? "مجموعات صغيرة" : "Small Groups"}
-            </span>
-          </div>
-        </div>
-      </section>
-
       {/* ── FEATURES (expandable accordion) ──────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-10 text-center">
