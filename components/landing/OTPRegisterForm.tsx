@@ -106,10 +106,10 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
   if (step === "done") {
     return (
       <div className="flex flex-col items-center gap-3 py-6 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-emerald-100">
-          <CheckCircle className="size-9 text-emerald-500" />
+        <div className="flex size-16 items-center justify-center rounded-full bg-[#b3f82d]/10">
+          <CheckCircle className="size-9 text-[#32246b]" />
         </div>
-        <p className="text-lg font-bold text-gray-900">
+        <p className="text-lg font-bold text-[#32246b]">
           {isAr ? "تم التحقق! جاري التحويل..." : "Verified! Redirecting..."}
         </p>
       </div>
@@ -125,8 +125,11 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
         </p>
 
         {/* Phone input */}
-        <div className="flex overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-sm transition focus-within:border-blue-500 focus-within:shadow-md">
-          <span className="flex items-center gap-2 border-e-2 border-gray-200 bg-gray-50 px-4 text-sm font-bold text-gray-700 shrink-0">
+        <div className={cn(
+          "flex overflow-hidden rounded-2xl border-2 bg-white shadow-sm transition",
+          "focus-within:border-[#5356df] focus-within:shadow-md border-[#5356df]/30"
+        )}>
+          <span className="flex items-center gap-2 border-e-2 border-[#5356df]/20 bg-[#f8f6ff] px-4 text-sm font-bold text-[#32246b] shrink-0">
             🇰🇼 +965
           </span>
           <input
@@ -138,7 +141,7 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
             autoComplete="off"
             dir="ltr"
             placeholder="5X XXX XXXX"
-            className="flex-1 bg-transparent px-4 py-4 text-base text-gray-900 outline-none placeholder:text-gray-300"
+            className="flex-1 bg-transparent px-4 py-4 text-base text-[#1f406b] outline-none placeholder:text-[#5356df]/30"
           />
         </div>
 
@@ -153,10 +156,10 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
         <button
           onClick={sendOTP}
           disabled={loading || !isValid}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition hover:opacity-90 hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#32246b] py-4 text-base font-bold text-[#b3f82d] shadow-lg shadow-[#32246b]/20 transition hover:bg-[#5356df] hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
         >
           {loading
-            ? <span className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ? <span className="size-5 animate-spin rounded-full border-2 border-[#b3f82d] border-t-transparent" />
             : <>{t("hero.send_otp", locale)} <ArrowNext className="size-5" /></>}
         </button>
       </div>
@@ -170,7 +173,7 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => { setStep("phone"); setError(""); setOtp(["","","","","",""]) }}
-          className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-gray-800"
+          className="flex items-center gap-1 text-sm font-medium text-[#5356df]/60 hover:text-[#32246b]"
         >
           <ArrowLeft className="size-3.5" />
           {t("hero.change_number", locale)}
@@ -204,7 +207,11 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
             onChange={(e) => handleOtpChange(i, e.target.value)}
             onKeyDown={(e) => handleOtpKey(i, e)}
             onFocus={(e) => e.target.select()}
-            className="size-11 rounded-xl border-2 border-gray-200 bg-white text-center text-lg font-bold text-gray-900 outline-none shadow-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:size-12"
+            className={cn(
+              "size-11 rounded-xl border-2 bg-white text-center text-lg font-bold text-[#32246b] outline-none shadow-sm transition sm:size-12",
+              d ? "border-[#b3f82d] bg-[#b3f82d]/5" : "border-[#5356df]/30",
+              "focus:border-[#5356df] focus:ring-2 focus:ring-[#5356df]/20"
+            )}
           />
         ))}
       </div>
@@ -218,10 +225,10 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
       <button
         onClick={verifyOTP}
         disabled={loading || otp.join("").length < 6}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#32246b] py-4 text-base font-bold text-[#b3f82d] shadow-lg shadow-[#32246b]/20 transition hover:bg-[#5356df] active:scale-[0.98] disabled:opacity-50"
       >
         {loading
-          ? <span className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ? <span className="size-5 animate-spin rounded-full border-2 border-[#b3f82d] border-t-transparent" />
           : <>{t("hero.verify_otp", locale)} <CheckCircle className="size-5" /></>}
       </button>
 
@@ -232,7 +239,7 @@ export default function OTPRegisterForm({ locale }: { locale: Locale }) {
             {t("hero.resend_in", locale).replace("{n}", String(countdown))}
           </p>
         ) : (
-          <button onClick={resend} className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:underline">
+          <button onClick={resend} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#5356df] hover:text-[#32246b] hover:underline">
             <RefreshCw className="size-3.5" />
             {t("hero.resend", locale)}
           </button>

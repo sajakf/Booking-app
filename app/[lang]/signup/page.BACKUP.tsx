@@ -107,22 +107,22 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
     await handleSendOTP()
   }
 
-  // ── Input style ───────────────────────────────────────────────────────────
+  // ── Shared input style (matches booking flow) ─────────────────────────────
   const inputCls = (hasError?: boolean) => cn(
     "w-full rounded-2xl border-2 bg-white/10 px-4 py-3.5 text-white placeholder:text-white/30 outline-none transition",
-    "focus:border-[#b3f82d] focus:bg-white/15",
+    "focus:border-yellow-400 focus:bg-white/15",
     hasError ? "border-red-400" : "border-white/20"
   )
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#32246b]" dir={isAr ? "rtl" : "ltr"}>
+    <div className="flex min-h-screen flex-col bg-[#0a1628]" dir={isAr ? "rtl" : "ltr"}>
 
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#32246b]/95 shadow-lg backdrop-blur">
+      {/* ── Header — identical to BookingShell ── */}
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0d1f3c]/95 shadow-lg backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <Link href={`/${locale}`} className="flex items-center gap-2 text-white transition hover:opacity-80">
-            <Telescope className="size-5 text-[#b3f82d]" />
-            <span className="hidden text-sm font-bold text-[#b3f82d] sm:inline">Science Club</span>
+            <Telescope className="size-5 text-yellow-400" />
+            <span className="hidden text-sm font-bold text-yellow-400 sm:inline">Science Club</span>
           </Link>
           <LanguageToggle />
         </div>
@@ -133,14 +133,14 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
 
         {/* ── SUCCESS ── */}
         {step === "done" && (
-          <div className="rounded-3xl border border-[#b3f82d]/20 bg-[#b3f82d]/10 p-10 text-center">
-            <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-[#b3f82d]/20 ring-4 ring-[#b3f82d]/30">
-              <CheckCircle className="size-10 text-[#b3f82d]" />
+          <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/10 p-10 text-center">
+            <div className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full bg-emerald-400/20 ring-4 ring-emerald-400/30">
+              <CheckCircle className="size-10 text-emerald-400" />
             </div>
             <p className="text-2xl font-extrabold text-white">
               {isAr ? "تم التسجيل بنجاح! 🎉" : "You're in! 🎉"}
             </p>
-            <p className="mt-2 text-sm text-[#b3f82d]/80">
+            <p className="mt-2 text-sm text-emerald-300">
               {isAr ? "جاري تحويلك…" : "Redirecting you now…"}
             </p>
           </div>
@@ -151,14 +151,14 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
           <>
             <div className="mb-8 text-center">
               <div className="mb-4 flex justify-center">
-                <div className="flex size-16 items-center justify-center rounded-full bg-[#b3f82d]/20 ring-2 ring-[#b3f82d]/40">
-                  <Sparkles className="size-8 text-[#b3f82d]" />
+                <div className="flex size-16 items-center justify-center rounded-full bg-yellow-400/20 ring-2 ring-yellow-400/40">
+                  <Sparkles className="size-8 text-yellow-400" />
                 </div>
               </div>
               <h1 className="text-3xl font-extrabold text-white">
                 {isAr ? "إنشاء حساب" : "Create Account"}
               </h1>
-              <p className="mt-2 text-white/60">
+              <p className="mt-2 text-blue-200">
                 {isAr ? "أدخل اسمك ورقم هاتفك للمتابعة" : "Enter your name & phone number to continue"}
               </p>
             </div>
@@ -168,7 +168,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
 
                 {/* Full Name */}
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-white/70">
+                  <label className="block text-sm font-semibold text-blue-200">
                     {isAr ? "الاسم الكامل" : "Full Name"}
                   </label>
                   <div className="relative">
@@ -188,12 +188,12 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
 
                 {/* Mobile */}
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-white/70">
+                  <label className="block text-sm font-semibold text-blue-200">
                     {isAr ? "رقم الجوال" : "Mobile Number"}
                   </label>
                   <div className={cn(
                     "flex overflow-hidden rounded-2xl border-2 bg-white/10 transition",
-                    "focus-within:border-[#b3f82d] focus-within:bg-white/15 border-white/20"
+                    "focus-within:border-yellow-400 focus-within:bg-white/15 border-white/20"
                   )}>
                     <span className="flex shrink-0 items-center gap-1.5 border-e border-white/20 bg-white/10 px-4 text-sm font-bold text-white/70">
                       🇰🇼 +965
@@ -234,7 +234,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                   className={cn(
                     "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition-all",
                     !loading && name.trim() && phoneDigits.length >= 8
-                      ? "bg-[#b3f82d] text-[#32246b] shadow-lg shadow-[#b3f82d]/20 hover:bg-[#c5ff45] active:scale-[0.98]"
+                      ? "bg-yellow-400 text-[#0a1628] shadow-lg shadow-yellow-400/30 hover:bg-yellow-300 active:scale-[0.98]"
                       : "cursor-not-allowed bg-white/10 text-white/40"
                   )}
                 >
@@ -265,14 +265,14 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                 {isAr ? "تغيير الرقم" : "Change number"}
               </button>
               <div className="mb-4 flex justify-center">
-                <div className="flex size-16 items-center justify-center rounded-full bg-[#5356df]/20 ring-2 ring-[#5356df]/40">
-                  <Phone className="size-8 text-[#5356df]" />
+                <div className="flex size-16 items-center justify-center rounded-full bg-blue-400/20 ring-2 ring-blue-400/40">
+                  <Phone className="size-8 text-blue-300" />
                 </div>
               </div>
               <h1 className="text-3xl font-extrabold text-white">
                 {isAr ? "أدخل رمز التحقق" : "Enter OTP"}
               </h1>
-              <p className="mt-2 text-sm text-white/60">
+              <p className="mt-2 text-sm text-blue-200">
                 {isAr
                   ? <span>أُرسل رمز مكوّن من 6 أرقام إلى <span className="font-bold text-white" dir="ltr">+965 {phoneDigits}</span></span>
                   : <span>We sent a 6-digit code to <span className="font-bold text-white">+965 {phoneDigits}</span></span>
@@ -288,7 +288,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                   <span className="text-xl">🔧</span>
                   <div>
                     <p className="text-xs font-semibold text-amber-300">Dev mode — OTP code:</p>
-                    <p className="text-2xl font-extrabold tracking-widest text-[#b3f82d]">{devCode}</p>
+                    <p className="text-2xl font-extrabold tracking-widest text-yellow-400">{devCode}</p>
                   </div>
                 </div>
               )}
@@ -308,8 +308,8 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                     onFocus={(e) => e.target.select()}
                     className={cn(
                       "size-12 rounded-2xl border-2 bg-white/10 text-center text-xl font-extrabold text-white outline-none transition",
-                      digit ? "border-[#b3f82d] bg-[#b3f82d]/10" : "border-white/20",
-                      "focus:border-[#b3f82d] focus:bg-white/15"
+                      digit ? "border-yellow-400 bg-yellow-400/10" : "border-white/20",
+                      "focus:border-yellow-400 focus:bg-white/15"
                     )}
                   />
                 ))}
@@ -328,7 +328,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition-all",
                   !loading && otp.join("").length >= 6
-                    ? "bg-[#b3f82d] text-[#32246b] shadow-lg shadow-[#b3f82d]/20 hover:bg-[#c5ff45] active:scale-[0.98]"
+                    ? "bg-yellow-400 text-[#0a1628] shadow-lg shadow-yellow-400/30 hover:bg-yellow-300 active:scale-[0.98]"
                     : "cursor-not-allowed bg-white/10 text-white/40"
                 )}
               >
@@ -347,7 +347,7 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
                 ) : (
                   <button
                     onClick={handleResend}
-                    className="mx-auto flex items-center gap-1.5 text-sm font-semibold text-[#b3f82d] hover:text-[#c5ff45] transition"
+                    className="mx-auto flex items-center gap-1.5 text-sm font-semibold text-yellow-400 hover:text-yellow-300 transition"
                   >
                     <RefreshCw className="size-3.5" />
                     {isAr ? "إعادة إرسال الرمز" : "Resend code"}
@@ -359,8 +359,8 @@ export default function SignupPage({ params }: { params: Promise<{ lang: string 
         )}
       </main>
 
-      {/* ── Footer ── */}
-      <div className="flex h-16 select-none items-center justify-center text-xl tracking-widest text-[#b3f82d]/20 pointer-events-none">
+      {/* ── Footer — identical to BookingShell ── */}
+      <div className="flex h-16 select-none items-center justify-center text-xl tracking-widest text-white/20 pointer-events-none">
         ✦ ✦ ✦ ✦ ✦
       </div>
     </div>

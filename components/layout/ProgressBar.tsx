@@ -33,8 +33,8 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
               <div
                 className={cn(
                   "flex size-7 items-center justify-center rounded-full text-xs font-bold transition-all",
-                  isCompleted && "bg-yellow-400 text-navy-900 shadow-sm",
-                  isActive && "bg-yellow-400 text-[#0a1628] ring-4 ring-yellow-200 shadow-md scale-110",
+                  isCompleted && "bg-[#b3f82d] text-[#32246b] shadow-sm",
+                  isActive && "bg-[#b3f82d] text-[#32246b] ring-4 ring-[#b3f82d]/30 shadow-md scale-110",
                   !isCompleted && !isActive && "bg-white/20 text-white/50 border border-white/20",
                 )}
               >
@@ -43,7 +43,7 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
               <span
                 className={cn(
                   "hidden text-[10px] font-semibold sm:block",
-                  isActive ? "text-yellow-300" : isCompleted ? "text-yellow-400/70" : "text-white/40",
+                  isActive ? "text-[#b3f82d]" : isCompleted ? "text-[#b3f82d]/70" : "text-white/40",
                 )}
               >
                 {t(step.key)}
@@ -53,7 +53,7 @@ export function ProgressBar({ currentStep }: ProgressBarProps) {
               <div
                 className={cn(
                   "mx-1 h-0.5 flex-1 transition-colors sm:mx-2",
-                  isCompleted ? "bg-yellow-400/60" : "bg-white/10",
+                  isCompleted ? "bg-[#b3f82d]/60" : "bg-white/10",
                 )}
               />
             )}

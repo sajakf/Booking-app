@@ -9,7 +9,6 @@ import { isValidLocale } from "@/lib/i18n"
 import type { Locale } from "@/types/i18n"
 import { Rocket, Sparkles, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ScientistBoy, ScientistGirl } from "@/components/ui/ScienceAvatars"
 
 export default function ChildPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = use(params)
@@ -47,22 +46,22 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
       {/* Hero heading */}
       <div className="mb-8 text-center">
         <div className="mb-3 flex justify-center">
-          <div className="flex size-16 items-center justify-center rounded-full bg-[#32246b]/10 ring-2 ring-[#32246b]/20">
-            <Rocket className="size-8 text-[#32246b]" />
+          <div className="flex size-16 items-center justify-center rounded-full bg-yellow-400/20 ring-2 ring-yellow-400/40">
+            <Rocket className="size-8 text-yellow-400" />
           </div>
         </div>
-        <h1 className="text-2xl font-extrabold text-[#32246b] sm:text-3xl">
+        <h1 className="text-2xl font-extrabold text-white sm:text-3xl">
           {t("step1.title")}
         </h1>
-        <p className="mt-2 text-base text-[#5356df]/80">{t("step1.subtitle")}</p>
+        <p className="mt-2 text-base text-blue-200">{t("step1.subtitle")}</p>
       </div>
 
       {/* Form card */}
-      <div className="rounded-3xl bg-white border border-[#5356df]/20 p-6 space-y-6 shadow-sm">
+      <div className="rounded-3xl bg-white/5 border border-white/10 p-6 space-y-6 backdrop-blur">
 
         {/* Child name */}
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-[#32246b]">
+          <label className="block text-sm font-bold text-blue-200">
             {t("step1.name.label")}
           </label>
           <input
@@ -72,9 +71,9 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
             placeholder={t("step1.name.placeholder")}
             autoComplete="off"
             className={cn(
-              "w-full rounded-2xl border-2 bg-white px-4 py-3.5 text-[#1f406b] placeholder:text-[#5356df]/30 outline-none transition",
-              "focus:border-[#5356df] focus:shadow-sm",
-              errors.name ? "border-red-400" : "border-[#5356df]/30"
+              "w-full rounded-2xl border-2 bg-white/10 px-4 py-3.5 text-white placeholder:text-white/30 outline-none transition",
+              "focus:border-yellow-400 focus:bg-white/15",
+              errors.name ? "border-red-400" : "border-white/20"
             )}
           />
           {errors.name && <ErrorMsg msg={errors.name} />}
@@ -82,7 +81,7 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
 
         {/* Age */}
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-[#32246b]">
+          <label className="block text-sm font-bold text-blue-200">
             {t("step1.age.label")}
           </label>
           <div className="relative">
@@ -94,24 +93,24 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
               onChange={(e) => { setAge(e.target.value); setErrors((prev) => ({ ...prev, age: undefined })) }}
               placeholder={t("step1.age.placeholder")}
               className={cn(
-                "w-full rounded-2xl border-2 bg-white px-4 py-3.5 text-[#1f406b] placeholder:text-[#5356df]/30 outline-none transition",
-                "focus:border-[#5356df] focus:shadow-sm",
-                errors.age ? "border-red-400" : "border-[#5356df]/30"
+                "w-full rounded-2xl border-2 bg-white/10 px-4 py-3.5 text-white placeholder:text-white/30 outline-none transition",
+                "focus:border-yellow-400 focus:bg-white/15",
+                errors.age ? "border-red-400" : "border-white/20"
               )}
             />
-            <span className="absolute end-4 top-1/2 -translate-y-1/2 text-sm text-[#5356df]/50">
+            <span className="absolute end-4 top-1/2 -translate-y-1/2 text-sm text-white/40">
               {isAr ? "سنة" : "yrs"}
             </span>
           </div>
           {errors.age
             ? <ErrorMsg msg={errors.age} />
-            : <p className="text-xs text-[#5356df]/60">{t("step1.age_hint")}</p>
+            : <p className="text-xs text-white/40">{t("step1.age_hint")}</p>
           }
         </div>
 
         {/* Gender */}
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-[#32246b]">
+          <label className="block text-sm font-bold text-blue-200">
             {t("step1.gender.label")}
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -125,19 +124,14 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
                   className={cn(
                     "relative flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all font-bold text-base",
                     isSelected
-                      ? "border-[#32246b] bg-[#32246b]/8 text-[#32246b] scale-[1.02] shadow-lg shadow-[#32246b]/10"
-                      : "border-[#5356df]/20 bg-white text-[#32246b]/60 hover:border-[#5356df]/40 hover:bg-[#f8f6ff]"
+                      ? "border-yellow-400 bg-yellow-400/15 text-yellow-300 scale-[1.02] shadow-lg shadow-yellow-400/20"
+                      : "border-white/20 bg-white/5 text-white/70 hover:border-white/40 hover:bg-white/10"
                   )}
                 >
-                  {g === "male"
-                    ? <ScientistBoy className="size-20" />
-                    : <ScientistGirl className="size-20" />
-                  }
-                  <span className={cn("text-sm font-bold", isSelected ? "text-[#32246b]" : "text-[#32246b]/60")}>
-                    {g === "male" ? (isAr ? "ولد" : "Boy") : (isAr ? "بنت" : "Girl")}
-                  </span>
+                  <span className="text-3xl">{g === "male" ? "👦" : "👧"}</span>
+                  <span>{g === "male" ? (isAr ? "ولد" : "Boy") : (isAr ? "بنت" : "Girl")}</span>
                   {isSelected && (
-                    <span className="absolute top-2 end-2 flex size-5 items-center justify-center rounded-full bg-[#b3f82d] text-[10px] text-[#32246b] font-black">
+                    <span className="absolute top-2 end-2 flex size-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] text-[#0a1628] font-black">
                       ✓
                     </span>
                   )}
@@ -154,7 +148,7 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
       <div className="mt-6">
         <button
           onClick={handleContinue}
-          className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-[#32246b] py-4 text-base font-extrabold text-[#b3f82d] shadow-lg shadow-[#32246b]/20 transition hover:bg-[#5356df] hover:shadow-xl active:scale-[0.98]"
+          className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-yellow-400 py-4 text-base font-extrabold text-[#0a1628] shadow-lg shadow-yellow-400/30 transition hover:bg-yellow-300 hover:shadow-xl active:scale-[0.98]"
         >
           <Sparkles className="size-5 group-hover:rotate-12 transition-transform" />
           {t("step1.continue")}
@@ -166,7 +160,7 @@ export default function ChildPage({ params }: { params: Promise<{ lang: string }
 
 function ErrorMsg({ msg }: { msg: string }) {
   return (
-    <p className="flex items-center gap-1.5 text-xs text-red-500">
+    <p className="flex items-center gap-1.5 text-xs text-red-400">
       <AlertCircle className="size-3.5 shrink-0" />
       {msg}
     </p>
