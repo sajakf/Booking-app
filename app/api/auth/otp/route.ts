@@ -36,9 +36,11 @@ async function makeToken(parentId: string, phone: string): Promise<string> {
 
 async function sendTwilioSMS(to: string, body: string): Promise<{ ok: boolean; error?: string }> {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-    console.warn("[OTP] Twilio not configured — logging code to console only")
-    return { ok: true } // allow dev flow to continue
+    console.warn("[OTP] Twilio env vars missing or empty — SID:", !!TWILIO_ACCOUNT_SID, "TOKEN:", !!TWILIO_AUTH_TOKEN, "FROM:", !!TWILIO_PHONE_NUMBER)
+    return { ok: false, error: "SMS service not configured. Please contact support." }
   }
+
+  console.log("[OTP] Sending SMS via Twilio to", to, "from", TWILIO_PHONE_NUMBER)
 
   const credentials = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64")
 
@@ -54,10 +56,20 @@ async function sendTwilioSMS(to: string, body: string): Promise<{ ok: boolean; e
     }
   )
 
+  const responseText = await res.text()
+  console.log("[Twilio] HTTP", res.status, responseText)
+
   if (!res.ok) {
-    const text = await res.text()
-    console.error("[Twilio]", res.status, text)
-    return { ok: false, error: "Failed to send SMS. Please try again." }
+    let friendlyError = "Failed to send SMS. Please try again."
+    try {
+      const json = JSON.parse(responseText)
+      // Twilio error codes: https://www.twilio.com/docs/api/errors
+      if (json.code === 21608) friendlyError = "This phone number is not verified in Twilio trial account."
+      else if (json.code === 20003) friendlyError = "Twilio authentication failed — check credentials."
+      else if (json.message) friendlyError = `Twilio: ${json.message}`
+    } catch { /* not JSON */ }
+    console.error("[Twilio] Error:", friendlyError)
+    return { ok: false, error: friendlyError }
   }
 
   return { ok: true }
