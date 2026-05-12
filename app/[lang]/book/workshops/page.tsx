@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useMemo } from "react"
+import { use, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { BookingShell } from "@/components/layout/BookingShell"
 import { useBooking } from "@/context/BookingContext"
@@ -9,7 +9,7 @@ import { isValidLocale } from "@/lib/i18n"
 import { getWorkshops, getTimeSlots } from "@/lib/mock-data/workshops"
 import type { Locale } from "@/types/i18n"
 import { cn } from "@/lib/utils"
-import { CheckCircle, Clock, Sparkles, Info } from "lucide-react"
+import { CheckCircle, Clock, Sparkles, Info, ChevronDown, AlertCircle } from "lucide-react"
 import type { TranslationKey } from "@/lib/i18n/en"
 import {
   Printer, Microscope, FlaskConical, Zap, Telescope,
@@ -33,6 +33,9 @@ export default function WorkshopsPage({ params }: { params: Promise<{ lang: stri
   const workshops = useMemo(() => getWorkshops(), [])
   const timeSlots = useMemo(() => getTimeSlots(), [])
   const selected = state.selectedWorkshopIds
+  const [agreedCampTerms, setAgreedCampTerms] = useState(false)
+  const [campTermsOpen, setCampTermsOpen] = useState(false)
+  const [showTermsError, setShowTermsError] = useState(false)
 
   // If no child info, redirect back
   if (!state.child) {
@@ -63,6 +66,7 @@ export default function WorkshopsPage({ params }: { params: Promise<{ lang: stri
 
   const handleContinue = () => {
     if (selected.length === 0) return
+    if (!agreedCampTerms) { setShowTermsError(true); return }
     router.push(`/${locale}/book/weeks`)
   }
 
@@ -113,6 +117,127 @@ export default function WorkshopsPage({ params }: { params: Promise<{ lang: stri
         t={t}
         slotBadgeColor="bg-cyan-500"
       />
+
+      {/* ── CAMP RULES & TERMS ──────────────────────────────────────────────── */}
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 overflow-hidden">
+        {/* Header row — click to expand */}
+        <button
+          type="button"
+          onClick={() => setCampTermsOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-start"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#b3f82d]/15">
+              <svg viewBox="0 0 20 20" className="size-4 text-[#b3f82d]" fill="none">
+                <path d="M6 2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </span>
+            <span className="text-sm font-bold text-white">
+              {isAr ? "قواعد المخيم وعقد الشروط والأحكام" : "Summer Camp Rules & Terms Contract"}
+            </span>
+          </div>
+          <ChevronDown className={cn("size-4 text-white/40 shrink-0 transition-transform", campTermsOpen && "rotate-180")} />
+        </button>
+
+        {/* Expandable contract */}
+        <div className={cn("overflow-hidden transition-all duration-300", campTermsOpen ? "max-h-[600px]" : "max-h-0")}>
+          <div className="space-y-4 border-t border-white/10 px-4 py-4 text-sm text-white/70">
+
+            {/* Section 1 */}
+            <div>
+              <p className="mb-1.5 font-bold text-[#b3f82d]">
+                {isAr ? "١. اتفاقية سلوك المتدرب وأدابه" : "1. Camper Behavior & Conduct Agreement"}
+              </p>
+              <ul className="space-y-1.5 ps-3">
+                {(isAr ? [
+                  "يُتوقع من جميع المتدربين احترام المدربين وزملائهم وممتلكات المخيم.",
+                  "لا يُسمح بالتنمر أو التحرش أو أي سلوك مُخل بالنظام.",
+                  "يحق للمخيم إنهاء مشاركة أي متدرب دون استرداد رسوم في حال انتهاك هذه القواعد.",
+                  "يلتزم المتدرب باتباع تعليمات المدربين في جميع الأنشطة.",
+                ] : [
+                  "All campers are expected to respect instructors, peers, and camp property at all times.",
+                  "Bullying, harassment, or disruptive behavior is strictly prohibited.",
+                  "The camp reserves the right to dismiss any camper without refund for violations.",
+                  "Campers must follow instructor directions during all activities.",
+                ]).map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#b3f82d]/60" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Section 2 */}
+            <div>
+              <p className="mb-1.5 font-bold text-[#b3f82d]">
+                {isAr ? "٢. إرشادات الصحة والسلامة" : "2. Health and Safety Guidelines"}
+              </p>
+              <ul className="space-y-1.5 ps-3">
+                {(isAr ? [
+                  "يجب على الوالدين إبلاغ المخيم بأي حالات طبية أو حساسية قبل بدء الأنشطة.",
+                  "ستُوفَّر معدات الحماية الشخصية لجميع التجارب المختبرية.",
+                  "يجب على المتدربين الإبلاغ الفوري عن أي إصابات لأحد أفراد الطاقم.",
+                  "لا يُسمح بتناول الطعام أو الشراب داخل المختبرات.",
+                ] : [
+                  "Parents must notify the camp of any medical conditions or allergies before sessions begin.",
+                  "Personal protective equipment (PPE) will be provided for all lab experiments.",
+                  "Campers must immediately report any injuries to a staff member.",
+                  "No food or drink is permitted inside laboratory spaces.",
+                ]).map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#b3f82d]/60" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Section 3 — Insurance (highlighted) */}
+            <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-3">
+              <p className="mb-1.5 font-bold text-amber-300">
+                {isAr ? "٣. التأمين الطبي ⚠️" : "3. Medical Insurance ⚠️"}
+              </p>
+              <p className="leading-relaxed text-amber-200/80">
+                {isAr
+                  ? "يجب على الوالدين / الأوصياء توفير معلومات التأمين الطبي الخاص بهم. المخيم غير مسؤول عن تغطية النفقات الطبية الناجمة عن الإصابات أو الحوادث خلال الأنشطة."
+                  : "Parents/guardians must provide their own medical insurance information. The camp is not responsible for covering any medical expenses arising from injuries or incidents during camp activities."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Checkbox row */}
+        <label className="flex cursor-pointer items-start gap-3 border-t border-white/10 px-4 py-3.5">
+          <div className="relative mt-0.5 shrink-0">
+            <input
+              type="checkbox"
+              checked={agreedCampTerms}
+              onChange={(e) => { setAgreedCampTerms(e.target.checked); setShowTermsError(false) }}
+              className="sr-only"
+            />
+            <div className={cn(
+              "flex size-5 items-center justify-center rounded border-2 transition-all",
+              agreedCampTerms ? "border-[#b3f82d] bg-[#b3f82d]" : "border-white/30 bg-white/5"
+            )}>
+              {agreedCampTerms && <span className="text-[10px] font-black text-[#32246b]">✓</span>}
+            </div>
+          </div>
+          <span className={cn("text-sm leading-snug", agreedCampTerms ? "text-white" : "text-white/60")}>
+            {isAr
+              ? "أقر بأنني قرأت وأوافق على قواعد المخيم وشروط الأحكام *"
+              : "I have read and agree to the Summer Camp Rules & Terms Contract *"}
+          </span>
+        </label>
+      </div>
+
+      {showTermsError && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-red-400">
+          <AlertCircle className="size-3.5 shrink-0" />
+          {isAr ? "يجب الموافقة على الشروط للمتابعة" : "You must agree to the terms to continue"}
+        </p>
+      )}
 
       {/* Selected summary + CTA */}
       <div className="sticky bottom-4 mt-6">

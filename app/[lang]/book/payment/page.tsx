@@ -8,7 +8,7 @@ import { useLocale } from "@/hooks/useLocale"
 import { BookingShell } from "@/components/layout/BookingShell"
 import { getWorkshop, getSession, getDaysForGender } from "@/lib/mock-data/workshops"
 import { cn } from "@/lib/utils"
-import { Shield, Loader2, Clock, Sparkles } from "lucide-react"
+import { Shield, Loader2, Clock, Sparkles, ChevronDown, AlertCircle } from "lucide-react"
 import { isValidLocale } from "@/lib/i18n"
 import type { PaymentMethod } from "@/types/booking"
 import type { Locale } from "@/types/i18n"
@@ -27,6 +27,9 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
   const [error, setError] = useState("")
   const [verifying, setVerifying] = useState(false)
   const [verifyResult, setVerifyResult] = useState<{ reason?: string; status?: string } | null>(null)
+  const [agreedPaymentTerms, setAgreedPaymentTerms] = useState(false)
+  const [paymentTermsOpen, setPaymentTermsOpen] = useState(false)
+  const [showPayTermsError, setShowPayTermsError] = useState(false)
 
   const urlError = searchParams.get("error")
   const urlPaymentId = searchParams.get("paymentId")
@@ -87,6 +90,7 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
   }
 
   const handlePay = async () => {
+    if (!agreedPaymentTerms) { setShowPayTermsError(true); return }
     // Guard: email is required by MyFatoorah
     const email = state.parent?.email?.trim() ?? ""
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -282,6 +286,101 @@ export default function PaymentPage({ params }: { params: Promise<{ lang: string
             {isAr ? "← العودة لإدخال البريد الإلكتروني" : "Go back and add email →"}
           </Link>
         </div>
+      )}
+
+      {/* ── PAYMENT TERMS & CONTRACT ─────────────────────────────────────────── */}
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 overflow-hidden">
+        {/* Header row */}
+        <button
+          type="button"
+          onClick={() => setPaymentTermsOpen((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-start"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-yellow-400/15">
+              <svg viewBox="0 0 20 20" className="size-4 text-yellow-400" fill="none">
+                <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2z" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M10 6v4l2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </span>
+            <span className="text-sm font-bold text-white">
+              {isAr ? "شروط الدفع وعقد الأحكام" : "Payment Rules & Terms Contract"}
+            </span>
+          </div>
+          <ChevronDown className={cn("size-4 text-white/40 shrink-0 transition-transform", paymentTermsOpen && "rotate-180")} />
+        </button>
+
+        {/* Expandable contract */}
+        <div className={cn("overflow-hidden transition-all duration-300", paymentTermsOpen ? "max-h-[500px]" : "max-h-0")}>
+          <div className="space-y-4 border-t border-white/10 px-4 py-4 text-sm text-white/70">
+
+            {/* Payment Terms */}
+            <div>
+              <p className="mb-1.5 font-bold text-yellow-400">
+                {isAr ? "١. شروط الدفع" : "1. Payment Terms"}
+              </p>
+              <p className="leading-relaxed">
+                {isAr
+                  ? "يجب دفع جميع الخدمات بالكامل في وقت الحجز. لن يتم تأكيد أي حجز إلا بعد اكتمال الدفع الكامل."
+                  : "All services must be paid in full at the time of booking. No booking will be confirmed until full payment has been completed."}
+              </p>
+            </div>
+
+            {/* Refund Policy */}
+            <div>
+              <p className="mb-1.5 font-bold text-yellow-400">
+                {isAr ? "٢. سياسة الاسترداد" : "2. Refund Policy"}
+              </p>
+              <p className="leading-relaxed">
+                {isAr
+                  ? "لا تُصدر أي مبالغ مستردة في حالات الفصل المبكر أو الأيام الغائبة بسبب مشكلات سلوكية. الرسوم المدفوعة نهائية وغير قابلة للاسترداد في هذه الحالات."
+                  : "No refunds are issued for early dismissal or missed days due to behavior issues. Fees paid are final and non-refundable in these cases."}
+              </p>
+            </div>
+
+            {/* Cancellations */}
+            <div className="rounded-xl border border-red-400/25 bg-red-400/10 p-3">
+              <p className="mb-1.5 font-bold text-red-300">
+                {isAr ? "٣. إلغاء الجلسات" : "3. Cancellations"}
+              </p>
+              <p className="leading-relaxed text-red-200/80">
+                {isAr
+                  ? "يحتفظ المخيم بالحق في إلغاء الجلسات في حالة قلة عدد المسجلين أو وجود مخاوف تتعلق بالسلامة. في حال قيام المخيم بالإلغاء، يحق للمشترك الحصول على استرداد كامل أو رصيد لجلسة مستقبلية."
+                  : "The camp reserves the right to cancel sessions due to low enrollment or safety concerns. In the event the camp cancels, participants are entitled to a full refund or credit toward a future session."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Checkbox row */}
+        <label className="flex cursor-pointer items-start gap-3 border-t border-white/10 px-4 py-3.5">
+          <div className="relative mt-0.5 shrink-0">
+            <input
+              type="checkbox"
+              checked={agreedPaymentTerms}
+              onChange={(e) => { setAgreedPaymentTerms(e.target.checked); setShowPayTermsError(false) }}
+              className="sr-only"
+            />
+            <div className={cn(
+              "flex size-5 items-center justify-center rounded border-2 transition-all",
+              agreedPaymentTerms ? "border-yellow-400 bg-yellow-400" : "border-white/30 bg-white/5"
+            )}>
+              {agreedPaymentTerms && <span className="text-[10px] font-black text-[#0a1628]">✓</span>}
+            </div>
+          </div>
+          <span className={cn("text-sm leading-snug", agreedPaymentTerms ? "text-white" : "text-white/60")}>
+            {isAr
+              ? "أقر بأنني قرأت وأوافق على شروط الدفع وسياسة الاسترداد وأحكام الإلغاء *"
+              : "I have read and agree to the Payment Terms, Refund Policy, and Cancellation Terms *"}
+          </span>
+        </label>
+      </div>
+
+      {showPayTermsError && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-red-400">
+          <AlertCircle className="size-3.5 shrink-0" />
+          {isAr ? "يجب الموافقة على شروط الدفع للمتابعة" : "You must agree to the payment terms to proceed"}
+        </p>
       )}
 
       {/* CTA */}
