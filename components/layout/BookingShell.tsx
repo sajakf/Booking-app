@@ -17,16 +17,16 @@ export function BookingShell({ children, step, backHref }: BookingShellProps) {
   const ChevronBack = locale === "ar" ? ChevronRight : ChevronLeft
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f8f6ff]">
-      {/* Top bar — purple navy */}
-      <header className="sticky top-0 z-20 bg-[#32246b]/95 backdrop-blur border-b border-white/10 shadow-lg">
+    <div className="flex min-h-screen flex-col bg-[#0d1133]">
+      {/* Top bar */}
+      <header className="sticky top-0 z-20 bg-[#32246b] backdrop-blur border-b border-white/10 shadow-xl">
         <div className="mx-auto max-w-2xl px-4 py-3">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {backHref ? (
                 <Link
                   href={backHref}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-white hover:bg-[#5356df]/40 transition"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/20 transition"
                 >
                   <ChevronBack className="size-4" />
                   <span className="hidden sm:inline">{t("nav.back")}</span>
@@ -45,12 +45,12 @@ export function BookingShell({ children, step, backHref }: BookingShellProps) {
       </header>
 
       {/* Page content */}
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
         {children}
       </main>
 
-      {/* Purple star dots footer */}
-      <div className="h-16 flex items-center justify-center select-none pointer-events-none text-[#32246b]/30 text-xl tracking-widest">
+      {/* Footer */}
+      <div className="h-14 flex items-center justify-center select-none pointer-events-none text-white/10 text-xl tracking-widest">
         ✦ ✦ ✦ ✦ ✦
       </div>
     </div>

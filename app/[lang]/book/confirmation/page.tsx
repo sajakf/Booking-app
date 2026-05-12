@@ -144,7 +144,7 @@ export default function ConfirmationPage({ params, searchParams }: {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f6ff]">
+      <div className="flex min-h-screen items-center justify-center bg-[#0d1133]">
         <div className="flex flex-col items-center gap-3 text-[#32246b]/40">
           <div className="size-10 animate-spin rounded-full border-4 border-[#32246b]/10 border-t-[#5356df]" />
           <p className="text-sm">{isAr ? "جاري التحميل…" : "Loading confirmation…"}</p>
@@ -155,7 +155,7 @@ export default function ConfirmationPage({ params, searchParams }: {
 
   if (error || !booking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f8f6ff] p-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#0d1133] p-4">
         <div className="rounded-3xl border border-[#32246b]/10 bg-white p-8 text-center shadow-sm">
           <p className="text-red-500 font-medium">{error || "Booking not found"}</p>
           <Link href={`/${lang}`} className="mt-4 inline-block text-sm text-[#5356df] underline">
@@ -167,7 +167,7 @@ export default function ConfirmationPage({ params, searchParams }: {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f8f6ff] pb-12" dir={isAr ? "rtl" : "ltr"}>
+    <div className="relative min-h-screen bg-[#0d1133] pb-12" dir={isAr ? "rtl" : "ltr"}>
       <FloatingElements />
 
       {/* Success banner */}
@@ -227,7 +227,7 @@ export default function ConfirmationPage({ params, searchParams }: {
                 { weekday: "long", day: "numeric", month: "long" }
               )
               return (
-                <div key={idx} className="flex items-center justify-between rounded-2xl border border-[#5356df]/10 bg-[#f8f6ff] p-3">
+                <div key={idx} className="flex items-center justify-between rounded-2xl border border-[#5356df]/10 bg-[#0d1133] p-3">
                   <div>
                     <p className="text-sm font-semibold text-[#32246b]">{formattedDate}</p>
                     <p className="text-xs text-[#5356df]/70">{item.classroomName}</p>
