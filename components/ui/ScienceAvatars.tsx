@@ -2,18 +2,45 @@
 
 import Image from "next/image"
 
+// ── SVG filter: removes white background from PNG images ──────────────────────
+// feColorMatrix formula: alpha = 1 - luminance
+// White (R=G=B=1) → alpha 0 (transparent); coloured pixels → alpha 1 (opaque)
+function WhiteBgFilter() {
+  return (
+    <svg
+      aria-hidden
+      style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+    >
+      <defs>
+        <filter id="rm-white" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="1  0  0  0  0
+                    0  1  0  0  0
+                    0  0  1  0  0
+                   -1 -1 -1  3  0"
+          />
+        </filter>
+      </defs>
+    </svg>
+  )
+}
+
 // ── ScientistBoy — real PNG avatar ────────────────────────────────────────────
 export function ScientistBoy({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
-    <Image
-      src="/avatars/scientist-boy.png"
-      alt="Scientist Boy"
-      width={160}
-      height={200}
-      className={className}
-      style={{ objectFit: "contain", ...style }}
-      priority
-    />
+    <>
+      <WhiteBgFilter />
+      <Image
+        src="/avatars/scientist-boy.png"
+        alt="Scientist Boy"
+        width={160}
+        height={200}
+        className={className}
+        style={{ objectFit: "contain", filter: "url(#rm-white)", ...style }}
+        priority
+      />
+    </>
   )
 }
 
@@ -81,7 +108,7 @@ export function ScientistGirl({ className, style }: { className?: string; style?
       width={160}
       height={200}
       className={className}
-      style={{ objectFit: "contain", ...style }}
+      style={{ objectFit: "contain", filter: "url(#rm-white)", ...style }}
       priority
     />
   )
